@@ -1,438 +1,3 @@
-<!doctype html>
-<html lang="it">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07111f">
-<title>TradeScope AI v1.2</title>
-
-<style>
-:root{
---bg:#07111f;
---card:#101c30;
---line:#ffffff1a;
---txt:#f8fafc;
---mut:#98a7bb;
---gold:#d9b56d;
---g:#35d49f;
---r:#ff637d;
---y:#ffd166;
-}
-
-*{box-sizing:border-box}
-
-body{
-margin:0;
-background:radial-gradient(circle at 0 0,#183a66 0,#07111f 38%,#050912 100%);
-color:var(--txt);
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-padding-bottom:80px;
-}
-
-header{
-position:sticky;
-top:0;
-z-index:9;
-background:#07111fe8;
-backdrop-filter:blur(18px);
-border-bottom:1px solid var(--line);
-padding:14px;
-}
-
-.top{
-max-width:1100px;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-}
-
-.brand{
-display:flex;
-gap:10px;
-align-items:center;
-}
-
-.logo{
-width:42px;
-height:42px;
-border-radius:14px;
-background:linear-gradient(135deg,#d9b56d,#ffe7a8);
-display:grid;
-place-items:center;
-font-weight:900;
-color:#07111f;
-}
-
-main{
-max-width:1100px;
-margin:auto;
-padding:14px;
-}
-
-.hero,.card{
-background:linear-gradient(160deg,var(--card),#0d1728);
-border:1px solid var(--line);
-border-radius:28px;
-padding:18px;
-margin-bottom:14px;
-}
-
-.hero h2{
-margin-top:0;
-font-size:34px;
-line-height:1.05;
-}
-
-.hero p,.mini{
-color:var(--mut);
-line-height:1.5;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(12,1fr);
-gap:14px;
-}
-
-.card{
-grid-column:span 12;
-}
-
-@media(min-width:800px){
-.two{grid-column:span 6}
-.three{grid-column:span 4}
-}
-
-textarea{
-width:100%;
-min-height:160px;
-background:#07101d;
-border:1px solid var(--line);
-border-radius:18px;
-padding:12px;
-color:white;
-font-size:13px;
-resize:vertical;
-}
-
-.btns{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-margin-top:12px;
-}
-
-.btn{
-border:0;
-border-radius:14px;
-padding:11px 14px;
-font-weight:800;
-cursor:pointer;
-background:#223450;
-color:white;
-}
-
-.gold{
-background:linear-gradient(135deg,#d9b56d,#f6da8f);
-color:#07111f;
-}
-
-.green{
-background:linear-gradient(135deg,#20bd86,#61e7ba);
-color:#06110e;
-}
-
-.red{
-background:#3a1520;
-color:#ffc1cb;
-}
-
-.kpi{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-}
-
-.box{
-background:#081321;
-border:1px solid var(--line);
-border-radius:18px;
-padding:12px;
-}
-
-.box small{
-display:block;
-font-size:12px;
-color:var(--mut);
-}
-
-.box strong{
-display:block;
-margin-top:5px;
-font-size:20px;
-}
-
-.tablewrap{
-max-height:400px;
-overflow:auto;
-border:1px solid var(--line);
-border-radius:18px;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-font-size:12px;
-}
-
-th,td{
-padding:10px;
-border-bottom:1px solid var(--line);
-text-align:left;
-}
-
-th{
-position:sticky;
-top:0;
-background:#0b1626;
-color:#f7dc98;
-}
-
-.tabs{
-display:flex;
-gap:8px;
-overflow:auto;
-margin-bottom:12px;
-}
-
-.tab{
-white-space:nowrap;
-border:1px solid var(--line);
-background:#081321;
-color:white;
-padding:9px 12px;
-border-radius:999px;
-cursor:pointer;
-font-size:12px;
-font-weight:800;
-}
-
-.tab.active{
-background:var(--gold);
-color:#07111f;
-}
-
-.hidden{
-display:none;
-}
-
-.copybox{
-white-space:pre-wrap;
-word-break:break-word;
-background:#07101d;
-border:1px solid var(--line);
-border-radius:16px;
-padding:12px;
-max-height:400px;
-overflow:auto;
-font-size:12px;
-}
-
-.status{
-padding:10px;
-border-radius:14px;
-background:#081321;
-border:1px solid var(--line);
-margin-top:8px;
-}
-
-input[type=file]{
-display:none;
-}
-
-.drop{
-display:block;
-border:1.5px dashed #d9b56d66;
-padding:18px;
-border-radius:20px;
-text-align:center;
-background:#d9b56d12;
-color:#f5d991;
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<div class="top">
-<div class="brand">
-<div class="logo">TS</div>
-<div>
-<div style="font-weight:900">TradeScope AI</div>
-<div class="mini">v1.2 — netto dividendi corretto</div>
-</div>
-</div>
-</div>
-</header>
-
-<main>
-
-<section class="hero">
-<h2>Dividendi corretti: lordo, tasse e netto reale.</h2>
-
-<p>
-Ora il tool interpreta correttamente il CSV Trade Republic:
-<br><br>
-<b>amount = lordo</b><br>
-<b>tax = tasse</b><br>
-<b>netto = lordo - tasse</b>
-</p>
-
-<div class="btns">
-<label class="btn gold" for="fileInput">📄 Carica CSV</label>
-<button class="btn" id="demoBtn">Demo</button>
-<button class="btn red" id="resetBtn">Reset</button>
-</div>
-
-<input id="fileInput" type="file" accept=".csv,text/csv">
-
-</section>
-
-<section class="grid">
-
-<div class="card two">
-
-<h3>Import CSV</h3>
-
-<label class="drop" for="fileInput">
-<b>Tocca qui da iPhone</b><br>
-Seleziona il CSV esportato da Trade Republic
-</label>
-
-<p class="mini">Oppure incolla il CSV qui sotto:</p>
-
-<textarea id="rawInput"></textarea>
-
-<div class="btns">
-<button class="btn green" id="parseBtn">Analizza CSV</button>
-</div>
-
-</div>
-
-<div class="card two">
-
-<h3>KPI</h3>
-
-<div class="kpi">
-
-<div class="box">
-<small>Movimenti</small>
-<strong id="kRows">0</strong>
-</div>
-
-<div class="box">
-<small>Dividendi lordi</small>
-<strong id="kGross">€0</strong>
-</div>
-
-<div class="box">
-<small>Tasse dividendi</small>
-<strong id="kTax">€0</strong>
-</div>
-
-<div class="box">
-<small>Dividendi netti</small>
-<strong id="kNet">€0</strong>
-</div>
-
-<div class="box">
-<small>Media netta mensile</small>
-<strong id="kAvg">€0</strong>
-</div>
-
-<div class="box">
-<small>Copertura mutuo</small>
-<strong id="kMortgage">0%</strong>
-</div>
-
-</div>
-
-</div>
-
-<div class="card three">
-<h3>Semaforo AI</h3>
-<div id="riskBox"></div>
-</div>
-
-<div class="card three">
-<h3>Export</h3>
-
-<p class="mini">
-📋 Report AI compatto → ChatGPT<br>
-📊 CSV movimenti → Excel<br>
-💸 CSV dividendi → controllo rendita
-</p>
-
-<div class="btns">
-<button class="btn gold" id="copyPrompt">Copia report AI</button>
-</div>
-
-</div>
-
-<div class="card three">
-<h3>Focus dividendi</h3>
-<div id="divBox"></div>
-</div>
-
-<div class="card">
-
-<div class="tabs">
-<button class="tab active" data-tab="mov">Movimenti</button>
-<button class="tab" data-tab="months">Dividendi per mese</button>
-<button class="tab" data-tab="assets">Dividendi per strumento</button>
-<button class="tab" data-tab="prompt">Report AI</button>
-</div>
-
-<div id="tab-mov" class="tabpane">
-<div class="tablewrap">
-<table>
-<thead id="thead"></thead>
-<tbody id="tbody"></tbody>
-</table>
-</div>
-</div>
-
-<div id="tab-months" class="tabpane hidden">
-<div class="tablewrap">
-<table>
-<thead id="mhead"></thead>
-<tbody id="mbody"></tbody>
-</table>
-</div>
-</div>
-
-<div id="tab-assets" class="tabpane hidden">
-<div class="tablewrap">
-<table>
-<thead id="ahead"></thead>
-<tbody id="abody"></tbody>
-</table>
-</div>
-</div>
-
-<div id="tab-prompt" class="tabpane hidden">
-<div id="promptOut" class="copybox"></div>
-</div>
-
-</div>
-
-</section>
-
-</main>
-
 <script>
 
 const $ = s => document.querySelector(s)
@@ -452,19 +17,131 @@ style:'currency',
 currency:'EUR'
 }).format(Number(n)||0)
 
+function mortgageText(v){
+return `${(v||0).toFixed(1)}%`
+}
+
+function num(v){
+
+if(v === null || v === undefined) return 0
+
+let s = String(v)
+.trim()
+.replace(/€/g,'')
+.replace(/\s/g,'')
+
+if(s.includes(',') && s.includes('.')){
+s = s.replace(/\./g,'').replace(',','.')
+}
+else if(s.includes(',')){
+s = s.replace(',','.')
+}
+
+return parseFloat(s) || 0
+
+}
+
+/* =========================
+   CSV PARSER ROBUSTO
+========================= */
+
+function detectDelimiter(text){
+
+const firstLine =
+(text || '')
+.split(/\r?\n/)
+.find(x => x.trim()) || ''
+
+const delimiters = [',',';','\t']
+
+let best = ','
+let max = 0
+
+delimiters.forEach(d => {
+
+const count = firstLine.split(d).length
+
+if(count > max){
+max = count
+best = d
+}
+
+})
+
+return best
+
+}
+
 function parseCSV(text){
 
-const lines = text.trim().split(/\r?\n/)
-const headers = lines[0].split(',')
+text = (text || '').replace(/^\uFEFF/,'')
 
-return lines.slice(1).map(line=>{
+const delimiter = detectDelimiter(text)
 
-const values = line.split(',')
+const rows = []
+
+let row = []
+let current = ''
+let insideQuotes = false
+
+for(let i=0;i<text.length;i++){
+
+const char = text[i]
+const next = text[i+1]
+
+if(char === '"'){
+
+if(insideQuotes && next === '"'){
+current += '"'
+i++
+}
+else{
+insideQuotes = !insideQuotes
+}
+
+}
+else if(char === delimiter && !insideQuotes){
+
+row.push(current)
+current = ''
+
+}
+else if((char === '\n' || char === '\r') && !insideQuotes){
+
+if(char === '\r' && next === '\n') i++
+
+row.push(current)
+
+if(row.some(v => String(v).trim() !== '')){
+rows.push(row)
+}
+
+row = []
+current = ''
+
+}
+else{
+current += char
+}
+
+}
+
+row.push(current)
+
+if(row.some(v => String(v).trim() !== '')){
+rows.push(row)
+}
+
+if(!rows.length) return []
+
+const headers = rows[0].map(h => String(h).trim())
+
+return rows.slice(1).map(r => {
 
 let obj = {}
 
 headers.forEach((h,i)=>{
-obj[h.trim()] = (values[i]||'').trim()
+obj[h] = r[i] ?? ''
 })
 
 return obj
@@ -473,17 +150,9 @@ return obj
 
 }
 
-function num(v){
-
-if(!v) return 0
-
-return parseFloat(
-String(v)
-.replace(/\./g,'')
-.replace(',','.')
-) || 0
-
-}
+/* =========================
+   ANALISI
+========================= */
 
 function analyze(rows){
 
@@ -494,20 +163,32 @@ let net = 0
 let monthly = {}
 let assets = {}
 
-rows.forEach(r=>{
+rows.forEach(r => {
 
-if((r.type||'').toUpperCase()==='DIVIDEND'){
+const type =
+String(r.type || r.Type || '')
+.toUpperCase()
 
-const g = Math.abs(num(r.amount))
-const t = Math.abs(num(r.tax))
-const n = g - t
+if(type === 'DIVIDEND'){
+
+const g = Math.abs(num(r.amount || r.Amount))
+const t = Math.abs(num(r.tax || r.Tax))
+const n = Math.max(0, g - t)
 
 gross += g
 tax += t
 net += n
 
-const month = (r.date||'').slice(0,7)
-const asset = r.name || r.symbol || 'N/D'
+const month =
+String(r.date || r.Date || '')
+.slice(0,7)
+
+const asset =
+r.name ||
+r.Name ||
+r.symbol ||
+r.Symbol ||
+'N/D'
 
 monthly[month] ??= 0
 monthly[month] += n
@@ -519,7 +200,8 @@ assets[asset] += n
 
 })
 
-const avg = Object.keys(monthly).length
+const avg =
+Object.keys(monthly).length
 ? net / Object.keys(monthly).length
 : 0
 
@@ -538,6 +220,10 @@ assets
 render(rows)
 
 }
+
+/* =========================
+   RENDER
+========================= */
 
 function render(rows){
 
@@ -569,6 +255,8 @@ ${money(s.avg * 12)}
 </div>
 `
 
+/* ===== TABELLA ===== */
+
 $('#thead').innerHTML = `
 <tr>
 <th>Data</th>
@@ -580,17 +268,25 @@ $('#thead').innerHTML = `
 `
 
 $('#tbody').innerHTML = rows
-.filter(r=>(r.type||'').toUpperCase()==='DIVIDEND')
-.map(r=>{
+.filter(r =>
+String(r.type || r.Type || '')
+.toUpperCase() === 'DIVIDEND'
+)
+.map(r => {
 
-const g = Math.abs(num(r.amount))
-const t = Math.abs(num(r.tax))
-const n = g - t
+const g =
+Math.abs(num(r.amount || r.Amount))
+
+const t =
+Math.abs(num(r.tax || r.Tax))
+
+const n =
+Math.max(0, g - t)
 
 return `
 <tr>
-<td>${r.date}</td>
-<td>${r.name}</td>
+<td>${r.date || r.Date || ''}</td>
+<td>${r.name || r.Name || ''}</td>
 <td>${money(g)}</td>
 <td>${money(t)}</td>
 <td>${money(n)}</td>
@@ -598,6 +294,8 @@ return `
 `
 
 }).join('')
+
+/* ===== MENSILE ===== */
 
 $('#mhead').innerHTML = `
 <tr>
@@ -608,12 +306,14 @@ $('#mhead').innerHTML = `
 
 $('#mbody').innerHTML =
 Object.entries(s.monthly)
-.map(([k,v])=>`
+.map(([k,v]) => `
 <tr>
 <td>${k}</td>
 <td>${money(v)}</td>
 </tr>
 `).join('')
+
+/* ===== ASSET ===== */
 
 $('#ahead').innerHTML = `
 <tr>
@@ -625,12 +325,14 @@ $('#ahead').innerHTML = `
 $('#abody').innerHTML =
 Object.entries(s.assets)
 .sort((a,b)=>b[1]-a[1])
-.map(([k,v])=>`
+.map(([k,v]) => `
 <tr>
 <td>${k}</td>
 <td>${money(v)}</td>
 </tr>
 `).join('')
+
+/* ===== PROMPT ===== */
 
 const compact = {
 dividendiNetti: s.net,
@@ -645,7 +347,7 @@ Object.entries(s.assets)
 state.prompt = `
 Analizza questo portafoglio Trade Republic.
 
-I dividendi sono già NETTI.
+I dividendi qui sotto sono già NETTI.
 
 ${JSON.stringify(compact,null,2)}
 
@@ -660,23 +362,49 @@ $('#promptOut').textContent = state.prompt
 
 }
 
-function mortgageText(v){
-return `${v.toFixed(1)}%`
-}
+/* =========================
+   EVENTI
+========================= */
 
-$('#parseBtn').onclick = ()=>{
+$('#parseBtn').onclick = () => {
+
+try{
 
 const txt = $('#rawInput').value
 
+if(!txt.trim()){
+alert('Incolla o carica un CSV.')
+return
+}
+
 const rows = parseCSV(txt)
+
+if(!rows.length){
+alert('CSV non valido o vuoto.')
+return
+}
 
 state.rows = rows
 
 analyze(rows)
 
 }
+catch(err){
 
-$('#fileInput').addEventListener('change', async e=>{
+console.error(err)
+
+alert(
+'Errore lettura CSV:\n' +
+(err.message || err)
+)
+
+}
+
+}
+
+$('#fileInput').addEventListener('change', async e => {
+
+try{
 
 const file = e.target.files[0]
 
@@ -692,20 +420,38 @@ state.rows = rows
 
 analyze(rows)
 
+}
+catch(err){
+
+console.error(err)
+
+alert(
+'Errore apertura file:\n' +
+(err.message || err)
+)
+
+}
+
 })
 
-$('#copyPrompt').onclick = async ()=>{
+$('#copyPrompt').onclick = async () => {
 
 try{
+
 await navigator.clipboard.writeText(state.prompt)
+
 alert('Report AI copiato')
-}catch(e){
-alert('Copia manualmente')
+
 }
+catch(e){
+
+alert('Copia manualmente il report.')
 
 }
 
-$('#demoBtn').onclick = ()=>{
+}
+
+$('#demoBtn').onclick = () => {
 
 const demo = `datetime,date,type,asset_class,name,symbol,amount,tax
 2026-01-01,2026-01-01,DIVIDEND,STOCK,BlackRock TCP Capital,US09259E1082,4.92,-1.83
@@ -721,27 +467,33 @@ analyze(rows)
 
 }
 
-$('#resetBtn').onclick = ()=>{
+$('#resetBtn').onclick = () => {
 location.reload()
 }
 
-$$('.tab').forEach(t=>{
+/* =========================
+   TABS
+========================= */
 
-t.onclick = ()=>{
+$$('.tab').forEach(t => {
 
-$$('.tab').forEach(x=>x.classList.remove('active'))
+t.onclick = () => {
+
+$$('.tab').forEach(x =>
+x.classList.remove('active')
+)
 
 t.classList.add('active')
 
-$$('.tabpane').forEach(p=>p.classList.add('hidden'))
+$$('.tabpane').forEach(p =>
+p.classList.add('hidden')
+)
 
-$('#tab-'+t.dataset.tab).classList.remove('hidden')
+$('#tab-'+t.dataset.tab)
+.classList.remove('hidden')
 
 }
 
 })
 
 </script>
-
-</body>
-</html>
