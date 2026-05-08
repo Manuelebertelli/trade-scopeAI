@@ -2,237 +2,746 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#07111f">
-<title>TradeScope AI v1.1</title>
+<title>TradeScope AI v1.2</title>
+
 <style>
-:root{--bg:#07111f;--card:#111d31;--card2:#17253d;--line:#ffffff1a;--text:#f8fafc;--mut:#9aa8bc;--gold:#d9b56d;--green:#35d49f;--red:#ff637d;--yellow:#ffd166;--blue:#6aa7ff;--r:22px}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#17365f 0,#07111f 38%,#050912 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;padding-bottom:80px}
-header{position:sticky;top:0;z-index:9;background:#07111fe8;backdrop-filter:blur(18px);border-bottom:1px solid var(--line);padding:13px 15px calc(13px + env(safe-area-inset-top))}
-.top{max-width:1120px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:10px}.brand{display:flex;align-items:center;gap:10px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--gold),#ffe7a8 52%,#7d6228);display:grid;place-items:center;color:#07111f;font-weight:950;box-shadow:0 0 28px #d9b56d55}.brand h1{font-size:19px;margin:0}.brand small{display:block;color:var(--mut);font-size:12px;margin-top:3px}.pill{font-size:12px;padding:8px 10px;border-radius:999px;border:1px solid #d9b56d66;color:#ffe5a7;background:#d9b56d17}
-main{max-width:1120px;margin:auto;padding:16px 13px}.hero,.card{border:1px solid var(--line);background:linear-gradient(160deg,var(--card),#0d1728);border-radius:28px;box-shadow:0 18px 60px #0007}.hero{padding:22px;margin-bottom:14px}.hero h2{font-size:29px;line-height:1.04;margin:0 0 10px}.hero p,.mini{color:var(--mut);line-height:1.45}.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:13px}.card{grid-column:span 12;padding:15px}.two,.three,.four{grid-column:span 12}@media(min-width:790px){.two{grid-column:span 6}.three{grid-column:span 4}.four{grid-column:span 3}.hero h2{font-size:40px}}
-input[type=file]{display:none}.drop{display:block;border:1.5px dashed #d9b56d66;background:#d9b56d12;border-radius:20px;padding:17px;text-align:center;color:#f5d991}.drop b{display:block;margin-bottom:4px}textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:18px;background:#07101d;color:var(--text);padding:12px;resize:vertical;outline:none;font-size:13px}.btns{display:flex;flex-wrap:wrap;gap:9px;margin-top:11px}.btn{border:0;border-radius:14px;padding:11px 12px;font-weight:850;background:#223450;color:var(--text);box-shadow:inset 0 0 0 1px #ffffff18;cursor:pointer}.btn.gold{background:linear-gradient(135deg,#d9b56d,#f6da8f);color:#07111f}.btn.green{background:linear-gradient(135deg,#20bd86,#61e7ba);color:#06110e}.btn.red{background:#3a1520;color:#ffc1cb}.btn:disabled{opacity:.45}.kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.box{background:#081321;border:1px solid var(--line);border-radius:18px;padding:12px}.box small{display:block;color:var(--mut);font-size:12px}.box strong{display:block;font-size:20px;margin-top:4px}.sub{font-size:12px;color:var(--mut);margin-top:4px}.status{display:flex;gap:9px;padding:10px;background:#081321;border:1px solid var(--line);border-radius:15px;margin:8px 0}.dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex:0 0 10px}.g{background:var(--green)}.y{background:var(--yellow)}.r{background:var(--red)}.b{background:var(--blue)}
-.tabs{display:flex;gap:8px;overflow:auto;margin-bottom:12px}.tab{white-space:nowrap;border:1px solid var(--line);border-radius:999px;background:#081321;color:#cbd5e1;padding:9px 11px;font-size:12px;font-weight:800}.tab.active{background:var(--gold);color:#07111f}.hidden{display:none!important}.tablewrap{max-height:390px;overflow:auto;border:1px solid var(--line);border-radius:16px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:#f7dc98;background:#0b1626;position:sticky;top:0}td{color:#dbe5f2}.copybox{white-space:pre-wrap;word-break:break-word;background:#07101d;border:1px solid var(--line);border-radius:16px;padding:12px;color:#dbeafe;max-height:390px;overflow:auto;font-size:12px}.tag{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:11px;color:#dbeafe;background:#ffffff0c}.ok{border-color:#35d49f55;background:#35d49f14;color:#baffdf}.warn{border-color:#ffd16655;background:#ffd16614;color:#ffe1a0}.bad{border-color:#ff637d55;background:#ff637d14;color:#ffc1cb}.privacy{border-left:4px solid var(--gold);padding-left:12px;font-size:12px;color:var(--mut)}
+:root{
+--bg:#07111f;
+--card:#101c30;
+--line:#ffffff1a;
+--txt:#f8fafc;
+--mut:#98a7bb;
+--gold:#d9b56d;
+--g:#35d49f;
+--r:#ff637d;
+--y:#ffd166;
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:radial-gradient(circle at 0 0,#183a66 0,#07111f 38%,#050912 100%);
+color:var(--txt);
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+padding-bottom:80px;
+}
+
+header{
+position:sticky;
+top:0;
+z-index:9;
+background:#07111fe8;
+backdrop-filter:blur(18px);
+border-bottom:1px solid var(--line);
+padding:14px;
+}
+
+.top{
+max-width:1100px;
+margin:auto;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.brand{
+display:flex;
+gap:10px;
+align-items:center;
+}
+
+.logo{
+width:42px;
+height:42px;
+border-radius:14px;
+background:linear-gradient(135deg,#d9b56d,#ffe7a8);
+display:grid;
+place-items:center;
+font-weight:900;
+color:#07111f;
+}
+
+main{
+max-width:1100px;
+margin:auto;
+padding:14px;
+}
+
+.hero,.card{
+background:linear-gradient(160deg,var(--card),#0d1728);
+border:1px solid var(--line);
+border-radius:28px;
+padding:18px;
+margin-bottom:14px;
+}
+
+.hero h2{
+margin-top:0;
+font-size:34px;
+line-height:1.05;
+}
+
+.hero p,.mini{
+color:var(--mut);
+line-height:1.5;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(12,1fr);
+gap:14px;
+}
+
+.card{
+grid-column:span 12;
+}
+
+@media(min-width:800px){
+.two{grid-column:span 6}
+.three{grid-column:span 4}
+}
+
+textarea{
+width:100%;
+min-height:160px;
+background:#07101d;
+border:1px solid var(--line);
+border-radius:18px;
+padding:12px;
+color:white;
+font-size:13px;
+resize:vertical;
+}
+
+.btns{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:12px;
+}
+
+.btn{
+border:0;
+border-radius:14px;
+padding:11px 14px;
+font-weight:800;
+cursor:pointer;
+background:#223450;
+color:white;
+}
+
+.gold{
+background:linear-gradient(135deg,#d9b56d,#f6da8f);
+color:#07111f;
+}
+
+.green{
+background:linear-gradient(135deg,#20bd86,#61e7ba);
+color:#06110e;
+}
+
+.red{
+background:#3a1520;
+color:#ffc1cb;
+}
+
+.kpi{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.box{
+background:#081321;
+border:1px solid var(--line);
+border-radius:18px;
+padding:12px;
+}
+
+.box small{
+display:block;
+font-size:12px;
+color:var(--mut);
+}
+
+.box strong{
+display:block;
+margin-top:5px;
+font-size:20px;
+}
+
+.tablewrap{
+max-height:400px;
+overflow:auto;
+border:1px solid var(--line);
+border-radius:18px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:12px;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid var(--line);
+text-align:left;
+}
+
+th{
+position:sticky;
+top:0;
+background:#0b1626;
+color:#f7dc98;
+}
+
+.tabs{
+display:flex;
+gap:8px;
+overflow:auto;
+margin-bottom:12px;
+}
+
+.tab{
+white-space:nowrap;
+border:1px solid var(--line);
+background:#081321;
+color:white;
+padding:9px 12px;
+border-radius:999px;
+cursor:pointer;
+font-size:12px;
+font-weight:800;
+}
+
+.tab.active{
+background:var(--gold);
+color:#07111f;
+}
+
+.hidden{
+display:none;
+}
+
+.copybox{
+white-space:pre-wrap;
+word-break:break-word;
+background:#07101d;
+border:1px solid var(--line);
+border-radius:16px;
+padding:12px;
+max-height:400px;
+overflow:auto;
+font-size:12px;
+}
+
+.status{
+padding:10px;
+border-radius:14px;
+background:#081321;
+border:1px solid var(--line);
+margin-top:8px;
+}
+
+input[type=file]{
+display:none;
+}
+
+.drop{
+display:block;
+border:1.5px dashed #d9b56d66;
+padding:18px;
+border-radius:20px;
+text-align:center;
+background:#d9b56d12;
+color:#f5d991;
+}
 </style>
 </head>
+
 <body>
-<header><div class="top"><div class="brand"><div class="logo">TS</div><div><h1>TradeScope AI</h1><small>Trade Republic exporter — v1.1</small></div></div><div class="pill">iPhone ready</div></div></header>
+
+<header>
+<div class="top">
+<div class="brand">
+<div class="logo">TS</div>
+<div>
+<div style="font-weight:900">TradeScope AI</div>
+<div class="mini">v1.2 — netto dividendi corretto</div>
+</div>
+</div>
+</div>
+</header>
+
 <main>
+
 <section class="hero">
-<h2>Analisi Trade Republic nativa: dividendi, cash, trading e rischio.</h2>
-<p>Importa il CSV ufficiale di Trade Republic. La v1.1 riconosce le colonne reali: <b>category, type, asset_class, amount, tax, fee, name, symbol</b>. Poi genera report, CSV pulito, JSON e prompt AI.</p>
-<div class="btns"><label class="btn gold" for="fileInput">📄 Carica CSV</label><button class="btn" id="demoBtn">Dati demo</button><button class="btn red" id="resetBtn">Reset</button></div>
-<input id="fileInput" type="file" accept=".csv,text/csv,.txt">
-<p class="privacy">Local-first: nessun login, nessun server, nessun invio automatico. I dati restano nel browser finché non decidi tu di esportarli o copiarli.</p>
+<h2>Dividendi corretti: lordo, tasse e netto reale.</h2>
+
+<p>
+Ora il tool interpreta correttamente il CSV Trade Republic:
+<br><br>
+<b>amount = lordo</b><br>
+<b>tax = tasse</b><br>
+<b>netto = lordo - tasse</b>
+</p>
+
+<div class="btns">
+<label class="btn gold" for="fileInput">📄 Carica CSV</label>
+<button class="btn" id="demoBtn">Demo</button>
+<button class="btn red" id="resetBtn">Reset</button>
+</div>
+
+<input id="fileInput" type="file" accept=".csv,text/csv">
+
 </section>
 
 <section class="grid">
+
 <div class="card two">
-<h3>1) Import</h3>
-<label class="drop" for="fileInput"><b>Tocca qui da iPhone</b>Seleziona “Esportazione operazioni.csv” da File/Download</label>
-<p class="mini">Oppure incolla il contenuto del CSV qui sotto.</p>
-<textarea id="rawInput" placeholder="Incolla qui il CSV Trade Republic..."></textarea>
-<div class="btns"><button class="btn green" id="parseBtn">Analizza CSV</button><button class="btn" id="pasteBtn">Incolla dagli appunti</button></div>
+
+<h3>Import CSV</h3>
+
+<label class="drop" for="fileInput">
+<b>Tocca qui da iPhone</b><br>
+Seleziona il CSV esportato da Trade Republic
+</label>
+
+<p class="mini">Oppure incolla il CSV qui sotto:</p>
+
+<textarea id="rawInput"></textarea>
+
+<div class="btns">
+<button class="btn green" id="parseBtn">Analizza CSV</button>
+</div>
+
 </div>
 
 <div class="card two">
-<h3>2) KPI principali</h3>
+
+<h3>KPI</h3>
+
 <div class="kpi">
-<div class="box"><small>Movimenti</small><strong id="kRows">0</strong><div class="sub">righe importate</div></div>
-<div class="box"><small>Dividendi netti</small><strong id="kDiv">€0,00</strong><div class="sub">amount DIVIDEND</div></div>
-<div class="box"><small>Interessi cash</small><strong id="kInt">€0,00</strong><div class="sub">INTEREST_PAYMENT</div></div>
-<div class="box"><small>Copertura mutuo</small><strong id="kMort">0%</strong><div class="sub">su 650€/mese</div></div>
-<div class="box"><small>Investito lordo</small><strong id="kBuy">€0,00</strong><div class="sub">BUY + crypto</div></div>
-<div class="box"><small>Derivati</small><strong id="kDer">0</strong><div class="sub">operazioni rilevate</div></div>
-</div>
-<div id="qualityBox" style="margin-top:12px"></div>
+
+<div class="box">
+<small>Movimenti</small>
+<strong id="kRows">0</strong>
 </div>
 
-<div class="card three"><h3>Semaforo</h3><div id="riskBox"><p class="mini">Importa il CSV per vedere il parere automatico.</p></div></div>
-<div class="card three"><h3>Focus dividendi</h3><div id="divBox"><p class="mini">Totale, media, forecast e migliori pagatori.</p></div></div>
-<div class="card three"><h3>Export</h3><p class="mini">Scarica i dati puliti o copia il prompt già pronto.</p><div class="btns"><button class="btn" id="dlCsv" disabled>CSV</button><button class="btn" id="dlJson" disabled>JSON</button><button class="btn" id="dlTxt" disabled>TXT</button><button class="btn gold" id="copyPrompt" disabled>Copia prompt</button></div></div>
+<div class="box">
+<small>Dividendi lordi</small>
+<strong id="kGross">€0</strong>
+</div>
+
+<div class="box">
+<small>Tasse dividendi</small>
+<strong id="kTax">€0</strong>
+</div>
+
+<div class="box">
+<small>Dividendi netti</small>
+<strong id="kNet">€0</strong>
+</div>
+
+<div class="box">
+<small>Media netta mensile</small>
+<strong id="kAvg">€0</strong>
+</div>
+
+<div class="box">
+<small>Copertura mutuo</small>
+<strong id="kMortgage">0%</strong>
+</div>
+
+</div>
+
+</div>
+
+<div class="card three">
+<h3>Semaforo AI</h3>
+<div id="riskBox"></div>
+</div>
+
+<div class="card three">
+<h3>Export</h3>
+
+<p class="mini">
+📋 Report AI compatto → ChatGPT<br>
+📊 CSV movimenti → Excel<br>
+💸 CSV dividendi → controllo rendita
+</p>
+
+<div class="btns">
+<button class="btn gold" id="copyPrompt">Copia report AI</button>
+</div>
+
+</div>
+
+<div class="card three">
+<h3>Focus dividendi</h3>
+<div id="divBox"></div>
+</div>
 
 <div class="card">
+
 <div class="tabs">
 <button class="tab active" data-tab="mov">Movimenti</button>
-<button class="tab" data-tab="dividends">Dividendi</button>
-<button class="tab" data-tab="types">Categorie</button>
-<button class="tab" data-tab="prompt">Prompt AI</button>
-<button class="tab" data-tab="json">JSON</button>
+<button class="tab" data-tab="months">Dividendi per mese</button>
+<button class="tab" data-tab="assets">Dividendi per strumento</button>
+<button class="tab" data-tab="prompt">Report AI</button>
 </div>
-<div id="tab-mov" class="tabpane"><div class="tablewrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div></div>
-<div id="tab-dividends" class="tabpane hidden"><div class="tablewrap"><table><thead id="dhead"></thead><tbody id="dbody"></tbody></table></div></div>
-<div id="tab-types" class="tabpane hidden"><div id="typeBox"></div></div>
-<div id="tab-prompt" class="tabpane hidden"><div id="promptOut" class="copybox">Nessun prompt generato.</div></div>
-<div id="tab-json" class="tabpane hidden"><div id="jsonOut" class="copybox">Nessun JSON generato.</div></div>
+
+<div id="tab-mov" class="tabpane">
+<div class="tablewrap">
+<table>
+<thead id="thead"></thead>
+<tbody id="tbody"></tbody>
+</table>
 </div>
+</div>
+
+<div id="tab-months" class="tabpane hidden">
+<div class="tablewrap">
+<table>
+<thead id="mhead"></thead>
+<tbody id="mbody"></tbody>
+</table>
+</div>
+</div>
+
+<div id="tab-assets" class="tabpane hidden">
+<div class="tablewrap">
+<table>
+<thead id="ahead"></thead>
+<tbody id="abody"></tbody>
+</table>
+</div>
+</div>
+
+<div id="tab-prompt" class="tabpane hidden">
+<div id="promptOut" class="copybox"></div>
+</div>
+
+</div>
+
 </section>
+
 </main>
 
 <script>
-const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-let state={rows:[],clean:[],summary:null,json:'',prompt:''};
-const MORTGAGE=650;
-const money=n=>new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0);
-const pct=n=>(Number(n)||0).toLocaleString('it-IT',{maximumFractionDigits:1})+'%';
-const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
 
-function parseAmount(v){ if(v===null||v===undefined||v==='') return 0; let s=String(v).trim().replace(/\s/g,'').replace(/€/g,'').replace(/EUR/ig,''); let neg=/^-/.test(s)||/^\(.*\)$/.test(s); s=s.replace(/[()]/g,'').replace(/[^0-9,.\-]/g,''); if(s.includes(',')&&s.includes('.')) s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\./g,'').replace(',','.'):s.replace(/,/g,''); else if(s.includes(',')) s=s.replace(',','.'); let n=parseFloat(s); return isNaN(n)?0:(neg?-Math.abs(n):n); }
-function detectDelimiter(text){ const first=(text||'').split(/\r?\n/).find(x=>x.trim())||''; const delims=[',',';','\t','|']; return delims.map(d=>[d,(first.split(d).length-1)]).sort((a,b)=>b[1]-a[1])[0][0]||','; }
-function parseCSV(text){ text=(text||'').replace(/^\uFEFF/,''); const d=detectDelimiter(text); let rows=[],row=[],cur='',q=false; for(let i=0;i<text.length;i++){const c=text[i],n=text[i+1]; if(c==='"'){ if(q&&n==='"'){cur+='"';i++} else q=!q; } else if(c===d&&!q){row.push(cur);cur=''} else if((c==='\n'||c==='\r')&&!q){ if(c==='\r'&&n==='\n') i++; row.push(cur); if(row.some(v=>String(v).trim()!=='')) rows.push(row); row=[]; cur=''; } else cur+=c;} row.push(cur); if(row.some(v=>String(v).trim()!=='')) rows.push(row); if(!rows.length) return []; const headers=rows[0].map(h=>String(h).trim()); return rows.slice(1).map(r=>{let o={};headers.forEach((h,i)=>o[h||('col_'+i)]=r[i]??'');return o});}
-function isNativeTR(rows){ if(!rows.length) return false; const h=Object.keys(rows[0]).map(norm); return ['category','type','asset_class','amount','name','symbol'].every(x=>h.includes(x)); }
-function get(row,k){ return row[k] ?? row[Object.keys(row).find(h=>norm(h)===k)] ?? ''; }
+const $ = s => document.querySelector(s)
+const $$ = s => [...document.querySelectorAll(s)]
 
-function classifyTR(r){
- const cat=String(get(r,'category')||'').toUpperCase(), type=String(get(r,'type')||'').toUpperCase(), asset=String(get(r,'asset_class')||'').toUpperCase(), name=String(get(r,'name')||''), desc=String(get(r,'description')||'');
- if(type==='DIVIDEND') return 'Dividendo';
- if(type==='INTEREST_PAYMENT') return 'Interessi cash';
- if(type.includes('TRANSFER_IN')) return 'Deposito';
- if(type.includes('TRANSFER_OUT')) return 'Prelievo';
- if(asset==='DERIVATIVE' || type.includes('WARRANT') || /turbo|knock|long|short|vontobel|soci.t. g.n.rale|société|societe|warrant/i.test(name+' '+desc)) return 'Derivato/Certificato';
- if(asset==='CRYPTO') return 'Crypto';
- if(asset==='ETF') return 'ETF';
- if(asset==='STOCK') return 'Azione';
- if(cat==='TRADING') return 'Trading';
- if(cat==='CASH') return 'Cash';
- return type || cat || 'Altro';
+let state = {
+rows: [],
+summary: null,
+prompt: ''
 }
-function classifyGeneric(r){ const blob=norm(Object.values(r).join(' ')); if(/dividend|dividendo|cedola|distribution/.test(blob))return'Dividendo'; if(/interest|interesse/.test(blob))return'Interessi cash'; if(/deposit|versamento|transfer_in|bonifico in entrata/.test(blob))return'Deposito'; if(/withdraw|prelievo|transfer_out/.test(blob))return'Prelievo'; if(/knock|turbo|warrant|derivat|leva|long|short|vontobel|soci.t. g.n.rale|societe/.test(blob))return'Derivato/Certificato'; if(/crypto|bitcoin|ethereum|btc|eth|xrp|solana/.test(blob))return'Crypto'; if(/etf|ucits|ishares|vanguard|jpmorgan|xtrackers|spdr|amundi/.test(blob))return'ETF'; if(/stock|azione|buy|sell|acquisto|vendita/.test(blob))return'Azione/Trading'; return'Altro'; }
-function pick(r,arr){ const hs=Object.keys(r); for(const k of arr){ const f=hs.find(h=>norm(h).includes(k)); if(f) return r[f]; } return ''; }
 
-function cleanRows(rows){
- const native=isNativeTR(rows);
- return rows.map((r,i)=>{
-  const tipo=native?classifyTR(r):classifyGeneric(r);
-  const amount=native?parseAmount(get(r,'amount')):parseAmount(pick(r,['amount','importo','total','totale','netto','lordo']));
-  const tax=native?parseAmount(get(r,'tax')):parseAmount(pick(r,['tax','tassa','imposta']));
-  const fee=native?parseAmount(get(r,'fee')):parseAmount(pick(r,['fee','commissione','costi']));
-  return {
-   n:i+1,
-   data:native?get(r,'date'):pick(r,['date','data']),
-   datetime:native?get(r,'datetime'):'',
-   categoria:native?get(r,'category'):'',
-   tipo,
-   tipoOriginale:native?get(r,'type'):'',
-   assetClass:native?get(r,'asset_class'):'',
-   strumento:native?(get(r,'name')||get(r,'symbol')||'Cash'):pick(r,['name','asset','titolo','product','description']),
-   symbol:native?get(r,'symbol'):'',
-   isin:native?(String(get(r,'symbol')).match(/^[A-Z]{2}[A-Z0-9]{9}[0-9]$/)?get(r,'symbol'):''):pick(r,['isin']),
-   quantita:parseAmount(native?get(r,'shares'):pick(r,['shares','quantita','qty'])),
-   prezzo:parseAmount(native?get(r,'price'):pick(r,['price','prezzo'])),
-   importo:amount,
-   commissioni:fee,
-   tasse:tax,
-   valuta:native?get(r,'currency'):'',
-   descrizione:native?get(r,'description'):'',
-   raw:r
-  };
- });
+const MORTGAGE = 650
+
+const money = n =>
+new Intl.NumberFormat('it-IT',{
+style:'currency',
+currency:'EUR'
+}).format(Number(n)||0)
+
+function parseCSV(text){
+
+const lines = text.trim().split(/\r?\n/)
+const headers = lines[0].split(',')
+
+return lines.slice(1).map(line=>{
+
+const values = line.split(',')
+
+let obj = {}
+
+headers.forEach((h,i)=>{
+obj[h.trim()] = (values[i]||'').trim()
+})
+
+return obj
+
+})
+
 }
-function ymd(d){ const x=new Date(d); return isNaN(x)?null:x; }
-function summarize(clean){
- const s={rows:clean.length,mode:isNativeTR(state.rows)?'Trade Republic nativo':'Generico',byType:{},byAssetClass:{},dividendiNetti:0,dividendiTasse:0,interessiCash:0,interessiTasse:0,depositi:0,prelievi:0,acquisti:0,vendite:0,commissioni:0,tasseTotali:0,derivatiCount:0,cryptoOps:0,monthlyDiv:{},dividendAssets:{},lastDate:null,firstDate:null};
- clean.forEach(x=>{
-  s.byType[x.tipo]=(s.byType[x.tipo]||0)+1; const ac=x.assetClass||'N/D'; s.byAssetClass[ac]=(s.byAssetClass[ac]||0)+1; s.commissioni+=Math.abs(x.commissioni||0); s.tasseTotali+=Math.abs(x.tasse||0);
-  const d=ymd(x.data); if(d){ if(!s.firstDate||d<s.firstDate)s.firstDate=d; if(!s.lastDate||d>s.lastDate)s.lastDate=d; }
-  if(x.tipo==='Dividendo'){ const net=Math.abs(x.importo); s.dividendiNetti+=net; s.dividendiTasse+=Math.abs(x.tasse||0); const m=(x.data||'Senza data').slice(0,7); s.monthlyDiv[m]=(s.monthlyDiv[m]||0)+net; const k=x.strumento||x.symbol||'Non identificato'; s.dividendAssets[k]=(s.dividendAssets[k]||0)+net; }
-  if(x.tipo==='Interessi cash'){ s.interessiCash+=Math.abs(x.importo); s.interessiTasse+=Math.abs(x.tasse||0); }
-  if(x.tipo==='Deposito') s.depositi+=Math.abs(x.importo);
-  if(x.tipo==='Prelievo') s.prelievi+=Math.abs(x.importo);
-  if(['Azione','ETF','Crypto','Derivato/Certificato','Trading','Azione/Trading'].includes(x.tipo) && x.importo<0) s.acquisti+=Math.abs(x.importo);
-  if(['Azione','ETF','Crypto','Derivato/Certificato','Trading','Azione/Trading'].includes(x.tipo) && x.importo>0) s.vendite+=Math.abs(x.importo);
-  if(x.tipo==='Derivato/Certificato') s.derivatiCount++;
-  if(x.tipo==='Crypto') s.cryptoOps++;
- });
- const months=Object.keys(s.monthlyDiv).filter(k=>k!=='Senza ').length || Object.keys(s.monthlyDiv).length;
- s.mediaDividendiMensile=months?s.dividendiNetti/months:0;
- s.forecastDividendi12m=s.mediaDividendiMensile*12;
- s.coperturaMutuoMensile=(s.mediaDividendiMensile/MORTGAGE)*100;
- s.coperturaMutuoAnnua=(s.forecastDividendi12m/(MORTGAGE*12))*100;
- s.topDividendi=Object.entries(s.dividendAssets).sort((a,b)=>b[1]-a[1]).slice(0,12);
- s.monthlyDivRows=Object.entries(s.monthlyDiv).sort();
- s.netDeposits=s.depositi-s.prelievi;
- s.firstDate=s.firstDate?s.firstDate.toISOString().slice(0,10):null; s.lastDate=s.lastDate?s.lastDate.toISOString().slice(0,10):null;
- return s;
+
+function num(v){
+
+if(!v) return 0
+
+return parseFloat(
+String(v)
+.replace(/\./g,'')
+.replace(',','.')
+) || 0
+
 }
-function risk(s){
- if(!s.rows) return [];
- const out=[];
- out.push(['b','Qualità import',s.mode==='Trade Republic nativo'?'CSV Trade Republic riconosciuto: analisi più affidabile.':'Formato generico: analisi indicativa.']);
- out.push([s.dividendiNetti>0?'g':'y','Dividendi',s.dividendiNetti>0?`Totale netto rilevato ${money(s.dividendiNetti)}. Media mensile ${money(s.mediaDividendiMensile)}.`:'Nessun dividendo rilevato.']);
- out.push([s.coperturaMutuoMensile>=25?'g':s.coperturaMutuoMensile>=5?'y':'r','Copertura mutuo',`I dividendi medi coprono circa ${pct(s.coperturaMutuoMensile)} di 650€/mese.`]);
- out.push([s.derivatiCount>0?'r':'g','Derivati',s.derivatiCount>0?`${s.derivatiCount} movimenti su derivati/certificati: tenerli separati dal portafoglio rendita.`:'Nessun derivato rilevato.']);
- out.push([s.cryptoOps>0?'y':'g','Crypto',s.cryptoOps>0?`${s.cryptoOps} movimenti crypto: ok solo con peso controllato.`:'Nessuna crypto rilevata.']);
- out.push([s.commissioni+s.tasseTotali>0?'y':'g','Costi e tasse',`Costi/commissioni: ${money(s.commissioni)}. Tasse rilevate: ${money(s.tasseTotali)}.`]);
- return out;
+
+function analyze(rows){
+
+let gross = 0
+let tax = 0
+let net = 0
+
+let monthly = {}
+let assets = {}
+
+rows.forEach(r=>{
+
+if((r.type||'').toUpperCase()==='DIVIDEND'){
+
+const g = Math.abs(num(r.amount))
+const t = Math.abs(num(r.tax))
+const n = g - t
+
+gross += g
+tax += t
+net += n
+
+const month = (r.date||'').slice(0,7)
+const asset = r.name || r.symbol || 'N/D'
+
+monthly[month] ??= 0
+monthly[month] += n
+
+assets[asset] ??= 0
+assets[asset] += n
+
 }
-function makePrompt(){
- return `Analizza il mio portafoglio Trade Republic usando questo export TradeScope AI v1.1.
+
+})
+
+const avg = Object.keys(monthly).length
+? net / Object.keys(monthly).length
+: 0
+
+const mortgage = avg / MORTGAGE * 100
+
+state.summary = {
+gross,
+tax,
+net,
+avg,
+mortgage,
+monthly,
+assets
+}
+
+render(rows)
+
+}
+
+function render(rows){
+
+const s = state.summary
+
+$('#kRows').textContent = rows.length
+$('#kGross').textContent = money(s.gross)
+$('#kTax').textContent = money(s.tax)
+$('#kNet').textContent = money(s.net)
+$('#kAvg').textContent = money(s.avg)
+$('#kMortgage').textContent = mortgageText(s.mortgage)
+
+$('#riskBox').innerHTML = `
+<div class="status">
+<b>Dividendi netti</b><br>
+${money(s.net)}
+</div>
+
+<div class="status">
+<b>Copertura mutuo</b><br>
+${mortgageText(s.mortgage)}
+</div>
+`
+
+$('#divBox').innerHTML = `
+<div class="status">
+<b>Forecast netto annuo</b><br>
+${money(s.avg * 12)}
+</div>
+`
+
+$('#thead').innerHTML = `
+<tr>
+<th>Data</th>
+<th>Nome</th>
+<th>Lordo</th>
+<th>Tasse</th>
+<th>Netto</th>
+</tr>
+`
+
+$('#tbody').innerHTML = rows
+.filter(r=>(r.type||'').toUpperCase()==='DIVIDEND')
+.map(r=>{
+
+const g = Math.abs(num(r.amount))
+const t = Math.abs(num(r.tax))
+const n = g - t
+
+return `
+<tr>
+<td>${r.date}</td>
+<td>${r.name}</td>
+<td>${money(g)}</td>
+<td>${money(t)}</td>
+<td>${money(n)}</td>
+</tr>
+`
+
+}).join('')
+
+$('#mhead').innerHTML = `
+<tr>
+<th>Mese</th>
+<th>Netto</th>
+</tr>
+`
+
+$('#mbody').innerHTML =
+Object.entries(s.monthly)
+.map(([k,v])=>`
+<tr>
+<td>${k}</td>
+<td>${money(v)}</td>
+</tr>
+`).join('')
+
+$('#ahead').innerHTML = `
+<tr>
+<th>Strumento</th>
+<th>Netto</th>
+</tr>
+`
+
+$('#abody').innerHTML =
+Object.entries(s.assets)
+.sort((a,b)=>b[1]-a[1])
+.map(([k,v])=>`
+<tr>
+<td>${k}</td>
+<td>${money(v)}</td>
+</tr>
+`).join('')
+
+const compact = {
+dividendiNetti: s.net,
+mediaMensile: s.avg,
+coperturaMutuo: s.mortgage,
+topPagatori:
+Object.entries(s.assets)
+.sort((a,b)=>b[1]-a[1])
+.slice(0,10)
+}
+
+state.prompt = `
+Analizza questo portafoglio Trade Republic.
+
+I dividendi sono già NETTI.
+
+${JSON.stringify(compact,null,2)}
 
 Obiettivi:
-1. aumentare i dividendi/cashflow mensile;
-2. capire quanto sono vicino a coprire una rata mutuo da 650€/mese;
-3. separare investimenti lunghi, trading, crypto e derivati;
-4. ridurre rischi inutili e overtrading;
-5. propormi un piano pratico in 3 step.
+- aumentare cashflow;
+- capire copertura mutuo 650€/mese;
+- valutare rischio;
+- migliorare dividendi.
+`
 
-Voglio:
-- analisi chiara e senza fuffa;
-- semaforo rischio;
-- focus dividendi: pagatori migliori, sostenibilità, concentrazione;
-- valutazione dei derivati/certificati;
-- suggerimenti operativi realistici.
+$('#promptOut').textContent = state.prompt
 
-Dati:
-${state.json}`;
 }
-function toCSV(rows){
- const cols=['n','data','categoria','tipo','tipoOriginale','assetClass','strumento','symbol','isin','quantita','prezzo','importo','commissioni','tasse','valuta','descrizione'];
- const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
- return cols.join(';')+'\n'+rows.map(r=>cols.map(c=>esc(r[c])).join(';')).join('\n');
-}
-function renderTable(){
- const cols=['data','tipo','assetClass','strumento','symbol','quantita','prezzo','importo','tasse'];
- $('#thead').innerHTML='<tr>'+cols.map(c=>`<th>${c}</th>`).join('')+'</tr>';
- $('#tbody').innerHTML=state.clean.slice(0,500).map(r=>'<tr>'+cols.map(c=>`<td>${['importo','prezzo','tasse'].includes(c)?money(r[c]):String(r[c]??'')}</td>`).join('')+'</tr>').join('');
- const divs=state.clean.filter(x=>x.tipo==='Dividendo');
- $('#dhead').innerHTML='<tr><th>data</th><th>strumento</th><th>netto</th><th>tasse</th><th>symbol</th></tr>';
- $('#dbody').innerHTML=divs.map(r=>`<tr><td>${r.data}</td><td>${r.strumento}</td><td>${money(r.importo)}</td><td>${money(Math.abs(r.tasse))}</td><td>${r.symbol}</td></tr>`).join('');
-}
-function render(){
- const s=state.summary||summarize([]);
- $('#kRows').textContent=s.rows||0; $('#kDiv').textContent=money(s.dividendiNetti||0); $('#kInt').textContent=money(s.interessiCash||0); $('#kMort').textContent=pct(s.coperturaMutuoMensile||0); $('#kBuy').textContent=money(s.acquisti||0); $('#kDer').textContent=s.derivatiCount||0;
- $('#qualityBox').innerHTML=state.clean.length?`<span class="tag ok">${s.mode}</span> <span class="tag">Periodo: ${s.firstDate||'?'} → ${s.lastDate||'?'}</span> <span class="tag">Tasse: ${money(s.tasseTotali)}</span>`:'<span class="tag warn">In attesa dati</span>';
- $('#riskBox').innerHTML=risk(s).map(x=>`<div class="status"><span class="dot ${x[0]}"></span><div><b>${x[1]}</b><br><span class="mini">${x[2]}</span></div></div>`).join('')||'<p class="mini">Importa il CSV per vedere il parere automatico.</p>';
- $('#divBox').innerHTML=state.clean.length?`<div class="box"><small>Media mensile</small><strong>${money(s.mediaDividendiMensile)}</strong><div class="sub">Forecast 12 mesi: ${money(s.forecastDividendi12m)}</div></div><p class="mini">Top pagatori:</p>${s.topDividendi.length?s.topDividendi.slice(0,6).map(a=>`<div class="status"><span class="dot g"></span><div><b>${a[0]}</b><br><span class="mini">${money(a[1])}</span></div></div>`).join(''):'<p class="mini">Nessun dividendo.</p>'}`:'<p class="mini">Totale, media, forecast e migliori pagatori.</p>';
- $('#typeBox').innerHTML=state.clean.length?Object.entries(s.byType).sort((a,b)=>b[1]-a[1]).map(a=>`<div class="status"><span class="dot b"></span><div><b>${a[0]}</b><br><span class="mini">${a[1]} movimenti</span></div></div>`).join(''):'<p class="mini">Nessun dato.</p>';
- renderTable(); $('#jsonOut').textContent=state.json||'Nessun JSON generato.'; $('#promptOut').textContent=state.prompt||'Nessun prompt generato.';
- ['#dlCsv','#dlJson','#dlTxt','#copyPrompt'].forEach(id=>$(id).disabled=!state.clean.length);
-}
-function analyze(text){
- const rows=parseCSV(text); state.rows=rows; state.clean=cleanRows(rows); state.summary=summarize(state.clean);
- const records=state.clean.map(({raw,...x})=>x);
- state.json=JSON.stringify({tool:'TradeScope AI',version:'1.1',generatedAt:new Date().toISOString(),mortgageTargetMonthly:MORTGAGE,summary:state.summary,records},null,2);
- state.prompt=makePrompt(); localStorage.setItem('tradescope_raw_v11',text); render();
-}
-function download(name,content,type='text/plain'){ const blob=new Blob([content],{type}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500); }
 
-$('#fileInput').addEventListener('change',async e=>{const f=e.target.files[0]; if(!f)return; const t=await f.text(); $('#rawInput').value=t; analyze(t);});
-$('#parseBtn').onclick=()=>analyze($('#rawInput').value);
-$('#pasteBtn').onclick=async()=>{try{$('#rawInput').value=await navigator.clipboard.readText()}catch(e){alert('Su iPhone incolla manualmente nel riquadro.')}};
-$('#resetBtn').onclick=()=>{localStorage.removeItem('tradescope_raw_v11');state={rows:[],clean:[],summary:null,json:'',prompt:''};$('#rawInput').value='';render();};
-$('#demoBtn').onclick=()=>{const demo=`datetime,date,account_type,category,type,asset_class,name,symbol,shares,price,amount,fee,tax,currency,description
-2026-01-01T08:59:14Z,2026-01-01,SECURITIES,CASH,DIVIDEND,STOCK,Dividend 15 Split,CA25537R1091,,,23.86,,-6.20,EUR,Cash Dividend
-2026-01-01T06:37:47Z,2026-01-01,CASH,CASH,INTEREST_PAYMENT,,,,,,0.56,,-0.15,EUR,Interest payment
-2026-01-02T07:45:08Z,2026-01-02,SECURITIES,TRADING,BUY,CRYPTO,Bitcoin,BTC,0.000128,78000,-10,,,EUR,Savings plan
-2026-01-02T09:04:28Z,2026-01-02,SECURITIES,TRADING,BUY,STOCK,Intesa Sanpaolo,IT0000072618,3.37,5.93,-20,,-0.04,EUR,Savings plan
-2026-01-05T09:04:28Z,2026-01-05,SECURITIES,TRADING,BUY,DERIVATIVE,Long 335 USD,DE000SV44SJ4,10,1.2,-12,-1,,EUR,Turbo long` ; $('#rawInput').value=demo; analyze(demo);};
-$('#dlCsv').onclick=()=>download('tradescope_movimenti_puliti_v1_1.csv',toCSV(state.clean),'text/csv');
-$('#dlJson').onclick=()=>download('tradescope_ai_export_v1_1.json',state.json,'application/json');
-$('#dlTxt').onclick=()=>download('tradescope_report_chatgpt_v1_1.txt',state.prompt,'text/plain');
-$('#copyPrompt').onclick=async()=>{try{await navigator.clipboard.writeText(state.prompt);alert('Prompt copiato.')}catch(e){alert('Copia manualmente dalla scheda Prompt AI.')}};
-$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');$$('.tabpane').forEach(p=>p.classList.add('hidden'));$('#tab-'+t.dataset.tab).classList.remove('hidden');});
-const saved=localStorage.getItem('tradescope_raw_v11'); if(saved){$('#rawInput').value=saved; try{analyze(saved)}catch(e){render();}} else render();
+function mortgageText(v){
+return `${v.toFixed(1)}%`
+}
+
+$('#parseBtn').onclick = ()=>{
+
+const txt = $('#rawInput').value
+
+const rows = parseCSV(txt)
+
+state.rows = rows
+
+analyze(rows)
+
+}
+
+$('#fileInput').addEventListener('change', async e=>{
+
+const file = e.target.files[0]
+
+if(!file) return
+
+const text = await file.text()
+
+$('#rawInput').value = text
+
+const rows = parseCSV(text)
+
+state.rows = rows
+
+analyze(rows)
+
+})
+
+$('#copyPrompt').onclick = async ()=>{
+
+try{
+await navigator.clipboard.writeText(state.prompt)
+alert('Report AI copiato')
+}catch(e){
+alert('Copia manualmente')
+}
+
+}
+
+$('#demoBtn').onclick = ()=>{
+
+const demo = `datetime,date,type,asset_class,name,symbol,amount,tax
+2026-01-01,2026-01-01,DIVIDEND,STOCK,BlackRock TCP Capital,US09259E1082,4.92,-1.83
+2026-05-08,2026-05-08,DIVIDEND,ETF,JPMorgan Global Equity Premium Income,IE0003UVYC20,7.77,-2.08`
+
+$('#rawInput').value = demo
+
+const rows = parseCSV(demo)
+
+state.rows = rows
+
+analyze(rows)
+
+}
+
+$('#resetBtn').onclick = ()=>{
+location.reload()
+}
+
+$$('.tab').forEach(t=>{
+
+t.onclick = ()=>{
+
+$$('.tab').forEach(x=>x.classList.remove('active'))
+
+t.classList.add('active')
+
+$$('.tabpane').forEach(p=>p.classList.add('hidden'))
+
+$('#tab-'+t.dataset.tab).classList.remove('hidden')
+
+}
+
+})
+
 </script>
+
 </body>
 </html>
