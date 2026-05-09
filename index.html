@@ -210,6 +210,13 @@ function analyze(rows){
   // exposures by asset class and asset name
   let exposures = {}
   let exposuresAssets = {}
+
+  // Track share counts and last known prices per asset for yield calculations
+  let shareCount = {}
+  let lastPrice = {}
+  // Track the months in which each asset paid a dividend (for averaging)
+  let divMonthsCount = {}
+
   rows.forEach(r=>{
     const type = String(r.type || r.Type || '').toUpperCase()
     const amount = num(r.amount || r.Amount)
@@ -231,6 +238,11 @@ function analyze(rows){
       assetsGross[name] ??= 0
       assetsGross[name] += grossDiv
       cash += net
+
+      // record month for dividend payouts per asset
+      divMonthsCount[name] ??= {}
+      // use the month (YYYY-MM) string as key
+      divMonthsCount[name][month] = true
     }
     else if(type === 'INTEREST_PAYMENT'){
       const net = Math.max(0, Math.abs(amount) - tax)
@@ -239,8 +251,11 @@ function analyze(rows){
     else if(type === 'BUY'){
       cash -= Math.abs(amount)
       invested += Math.abs(amount)
+
+      // accumulate positive investment for buys per month
       monthlyInv[month] ??= 0
       monthlyInv[month] += Math.abs(amount)
+
       // accumulate exposure for asset class and asset name
       if(assetClass){
         exposures[assetClass] ??= 0
@@ -248,12 +263,25 @@ function analyze(rows){
       }
       exposuresAssets[name] ??= 0
       exposuresAssets[name] += Math.abs(amount)
+
+      // update share count and last price for buys
+      const sh = num(r.shares || r.Shares)
+      const pr = num(r.price || r.Price)
+      if(sh > 0){
+        shareCount[name] = (shareCount[name] || 0) + sh
+      }
+      if(pr > 0){
+        lastPrice[name] = pr
+      }
     }
     else if(type.includes('TRANSFER_IN')){
       cash += Math.abs(amount)
       invested += Math.abs(amount)
+
+      // deposits count as positive investments
       monthlyInv[month] ??= 0
       monthlyInv[month] += Math.abs(amount)
+
       if(assetClass){
         exposures[assetClass] ??= 0
         exposures[assetClass] += Math.abs(amount)
@@ -263,19 +291,35 @@ function analyze(rows){
     }
     else if(type === 'SELL'){
       cash += Math.abs(amount)
+
+      // sells reduce investment
       monthlyInv[month] ??= 0
       monthlyInv[month] -= Math.abs(amount)
+
       if(assetClass){
-      exposures[assetClass] ??= 0
+        exposures[assetClass] ??= 0
         exposures[assetClass] -= Math.abs(amount)
       }
       exposuresAssets[name] ??= 0
       exposuresAssets[name] -= Math.abs(amount)
+
+      // update share count and last price for sells
+      const sh = num(r.shares || r.Shares)
+      const pr = num(r.price || r.Price)
+      if(sh > 0){
+        shareCount[name] = (shareCount[name] || 0) - sh
+      }
+      if(pr > 0){
+        lastPrice[name] = pr
+      }
     }
     else if(type.includes('TRANSFER_OUT')){
       cash -= Math.abs(amount)
+
+      // withdrawals reduce investment
       monthlyInv[month] ??= 0
       monthlyInv[month] -= Math.abs(amount)
+
       if(assetClass){
         exposures[assetClass] ??= 0
         exposures[assetClass] -= Math.abs(amount)
@@ -299,7 +343,7 @@ function analyze(rows){
   }
   renderCharts(monthly,assets,cashSeries,monthlyInv,coverage,exposures,exposuresAssets)
   // aggiorna la tabella dei rendimenti dividendi per asset
-  updateYieldTable(assetsGross, assets, exposuresAssets)
+  updateYieldTable(assetsGross, assets, exposuresAssets, shareCount, lastPrice, divMonthsCount)
   setStatus(
     `✅ CSV letto correttamente.<br>Righe analizzate: <b>${rows.length}</b><br>Dividendi netti rilevati: <b>${money(divNet)}</b>`
   )
@@ -427,7 +471,7 @@ function updateRiskSummary(exposures, exposuresAssets){
 }
 
 // Crea la tabella dei rendimenti dividendi per asset
-function updateYieldTable(assetsGross, assetsNet, exposuresAssets){
+function updateYieldTable(assetsGross, assetsNet, exposuresAssets, shareCount, lastPrice, divMonthsCount){
   const el = document.getElementById('yieldTable')
   if(!el) return
   // prepara la tabella
@@ -435,12 +479,30 @@ function updateYieldTable(assetsGross, assetsNet, exposuresAssets){
   for(const name in assetsNet){
     const netDiv = assetsNet[name] || 0
     const grossDiv = assetsGross[name] || 0
-    const exposure = exposuresAssets[name] || 0
-    if(netDiv <= 0 || exposure <= 0) continue
-    const annualGross = (grossDiv / exposure) * 100
-    const monthlyGross = annualGross / 12
-    const annualNet = (netDiv / exposure) * 100
-    const monthlyNet = annualNet / 12
+    // determine share count and last price for this asset
+    const shares = shareCount && shareCount[name] ? shareCount[name] : 0
+    let price = 0
+    if(lastPrice && lastPrice[name] > 0){
+      price = lastPrice[name]
+    }
+    // fallback: use cost basis exposures (exposure per share) if no price available
+    if(price <= 0 && shares > 0){
+      const exposure = exposuresAssets[name] || 0
+      if(exposure > 0){
+        price = exposure / shares
+      }
+    }
+    const investedVal = shares * price
+    // skip if no investment or no dividends
+    if(netDiv <= 0 || investedVal <= 0) continue
+    // count months in which dividends were paid
+    const monthsCount = divMonthsCount && divMonthsCount[name] ? Object.keys(divMonthsCount[name]).length : 0
+    const months = monthsCount > 0 ? monthsCount : 1
+    // compute average monthly yields (percent)
+    const monthlyGross = (grossDiv / investedVal) / months * 100
+    const annualGross = monthlyGross * 12
+    const monthlyNet = (netDiv / investedVal) / months * 100
+    const annualNet = monthlyNet * 12
     rows.push({name,annualGross,monthlyGross,annualNet,monthlyNet})
   }
   if(rows.length === 0){
