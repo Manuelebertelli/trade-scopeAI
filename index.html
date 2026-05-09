@@ -3,502 +3,295 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TradeScope AI v1.3.1</title>
-
+<title>TradeScope AI v1.3.2</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <style>
-body{
-margin:0;
-font-family:Arial,sans-serif;
-background:#07111f;
-color:white;
-}
-
-main{
-max-width:1100px;
-margin:auto;
-padding:16px;
-}
-
-.card{
-background:#101c30;
-border-radius:20px;
-padding:16px;
-margin-bottom:14px;
-}
-
-textarea,input{
-width:100%;
-padding:12px;
-border-radius:12px;
-border:1px solid #ffffff22;
-background:#07101d;
-color:white;
-box-sizing:border-box;
-}
-
-textarea{
-min-height:160px;
-resize:vertical;
-}
-
-.btn{
-padding:12px 14px;
-border-radius:12px;
-border:0;
-background:#d9b56d;
-color:#07111f;
-font-weight:700;
-cursor:pointer;
-margin-right:8px;
-margin-top:8px;
-}
-
-.btn.secondary{
-background:#223450;
-color:white;
-}
-
-.chartbox{
-height:320px;
-margin-top:14px;
-}
-
-.kpi{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-}
-
-.box{
-background:#081321;
-padding:12px;
-border-radius:14px;
-}
-
-.box small{
-display:block;
-color:#98a7bb;
-}
-
-.box strong{
-font-size:20px;
-}
-
-.filebox{
-border:1px dashed #d9b56d88;
-background:#d9b56d12;
-padding:14px;
-border-radius:14px;
-margin-top:12px;
-}
+body{margin:0;font-family:Arial,sans-serif;background:#07111f;color:white}
+main{max-width:1100px;margin:auto;padding:16px}
+.card{background:#101c30;border-radius:20px;padding:16px;margin-bottom:14px}
+textarea,input{width:100%;padding:12px;border-radius:12px;border:1px solid #ffffff22;background:#07101d;color:white;box-sizing:border-box}
+textarea{min-height:160px;resize:vertical}
+.btn{padding:12px 14px;border-radius:12px;border:0;background:#d9b56d;color:#07111f;font-weight:700;cursor:pointer;margin-right:8px;margin-top:8px}
+.btn.secondary{background:#223450;color:white}
+.chartbox{height:320px;margin-top:14px}
+.kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.box{background:#081321;padding:12px;border-radius:14px}
+.box small{display:block;color:#98a7bb}
+.box strong{font-size:20px}
+.filebox{border:1px dashed #d9b56d88;background:#d9b56d12;padding:14px;border-radius:14px;margin-top:12px}
+.status{background:#081321;border-radius:14px;padding:12px;margin-top:10px;color:#dbeafe}
 </style>
 </head>
-
 <body>
-
 <main>
 
 <div class="card">
+<h1>TradeScope AI v1.3.2</h1>
+<p>Dashboard Trade Republic con upload CSV, parser robusto, dividendi netti e grafici.</p>
 
-<h1>TradeScope AI v1.3.1</h1>
-
-<p>
-Dashboard Trade Republic con:
-cash stimato,
-dividendi netti,
-investimenti mensili,
-grafici.
-</p>
-
-<input
-id="initialCash"
-type="number"
-placeholder="Saldo cash iniziale">
+<input id="initialCash" type="number" placeholder="Saldo cash iniziale">
 
 <div class="filebox">
-<label for="csvUpload">
-<b>📄 Carica CSV Trade Republic</b><br>
-<span style="color:#98a7bb;font-size:14px">
-Seleziona il file CSV dal tuo iPhone / PC
-</span>
-</label>
-
+<label for="csvUpload"><b>📄 Carica CSV Trade Republic</b><br><span style="color:#98a7bb;font-size:14px">Seleziona il file CSV</span></label>
 <br><br>
-
-<input
-id="csvUpload"
-type="file"
-accept=".csv,text/csv">
+<input id="csvUpload" type="file" accept=".csv,text/csv">
 </div>
 
 <br>
 
-<textarea
-id="rawInput"
-placeholder="Oppure incolla qui il CSV Trade Republic"></textarea>
+<textarea id="rawInput" placeholder="Oppure incolla qui il CSV Trade Republic"></textarea>
 
 <br><br>
 
-<button class="btn secondary" id="demoBtn">
-Demo
-</button>
+<button class="btn secondary" id="demoBtn">Demo</button>
+<button class="btn" id="parseBtn">Analizza CSV</button>
 
-<button class="btn" id="parseBtn">
-Analizza CSV
-</button>
-
+<div id="statusBox" class="status">In attesa del CSV.</div>
 </div>
 
 <div class="card">
-
 <div class="kpi">
-
-<div class="box">
-<small>Dividendi netti</small>
-<strong id="kDiv">€0</strong>
+<div class="box"><small>Righe lette</small><strong id="kRows">0</strong></div>
+<div class="box"><small>Dividendi netti</small><strong id="kDiv">€0</strong></div>
+<div class="box"><small>Cash stimato</small><strong id="kCash">€0</strong></div>
+<div class="box"><small>Media mensile</small><strong id="kAvg">€0</strong></div>
+<div class="box"><small>Copertura mutuo</small><strong id="kMort">0%</strong></div>
+<div class="box"><small>Operazioni investimento</small><strong id="kInv">€0</strong></div>
 </div>
-
-<div class="box">
-<small>Cash stimato</small>
-<strong id="kCash">€0</strong>
-</div>
-
-<div class="box">
-<small>Media mensile</small>
-<strong id="kAvg">€0</strong>
-</div>
-
-<div class="box">
-<small>Copertura mutuo</small>
-<strong id="kMort">0%</strong>
-</div>
-
-</div>
-
 </div>
 
 <div class="card">
-
 <h3>Dividendi netti mensili</h3>
-
-<div class="chartbox">
-<canvas id="chartDiv"></canvas>
-</div>
-
+<div class="chartbox"><canvas id="chartDiv"></canvas></div>
 </div>
 
 <div class="card">
-
 <h3>Top pagatori dividendi</h3>
-
-<div class="chartbox">
-<canvas id="chartAssets"></canvas>
-</div>
-
+<div class="chartbox"><canvas id="chartAssets"></canvas></div>
 </div>
 
 <div class="card">
-
 <h3>Cash stimato</h3>
-
-<div class="chartbox">
-<canvas id="chartCash"></canvas>
-</div>
-
+<div class="chartbox"><canvas id="chartCash"></canvas></div>
 </div>
 
 </main>
 
 <script>
-
 const MORTGAGE = 650
-
 const $ = s => document.querySelector(s)
 
 const money = n =>
-new Intl.NumberFormat('it-IT',{
-style:'currency',
-currency:'EUR'
-}).format(Number(n)||0)
+new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)
+
+function setStatus(msg){
+  $('#statusBox').innerHTML = msg
+}
 
 function num(v){
-
-if(!v) return 0
-
-let s = String(v).trim()
-
-if(s.includes(',') && s.includes('.')){
-s = s.replace(/\./g,'').replace(',','.')
-}
-else if(s.includes(',')){
-s = s.replace(',','.')
+  if(v === null || v === undefined || v === '') return 0
+  let s = String(v).trim().replace(/€/g,'').replace(/\s/g,'')
+  if(s.includes(',') && s.includes('.')){
+    s = s.replace(/\./g,'').replace(',','.')
+  }else if(s.includes(',')){
+    s = s.replace(',','.')
+  }
+  return parseFloat(s) || 0
 }
 
-return parseFloat(s) || 0
-
+function detectDelimiter(text){
+  const firstLine = (text || '').split(/\r?\n/).find(x => x.trim()) || ''
+  const delimiters = [',',';','\t']
+  let best = ','
+  let max = 0
+  delimiters.forEach(d=>{
+    const count = firstLine.split(d).length
+    if(count > max){
+      max = count
+      best = d
+    }
+  })
+  return best
 }
 
 function parseCSV(text){
-
-const lines = text.trim().split(/\r?\n/)
-
-const headers = lines[0].split(',')
-
-return lines.slice(1).map(line=>{
-
-const values = line.split(',')
-
-let obj = {}
-
-headers.forEach((h,i)=>{
-obj[h.trim()] = (values[i] || '').trim()
-})
-
-return obj
-
-})
-
+  text = (text || '').replace(/^\uFEFF/,'')
+  const delimiter = detectDelimiter(text)
+  const rows = []
+  let row = []
+  let current = ''
+  let insideQuotes = false
+  for(let i=0;i<text.length;i++){
+    const char = text[i]
+    const next = text[i+1]
+    if(char === '"'){
+      if(insideQuotes && next === '"'){
+        current += '"'
+        i++
+      }else{
+        insideQuotes = !insideQuotes
+      }
+    }
+    else if(char === delimiter && !insideQuotes){
+      row.push(current)
+      current = ''
+    }
+    else if((char === '\n' || char === '\r') && !insideQuotes){
+      if(char === '\r' && next === '\n') i++
+      row.push(current)
+      if(row.some(v => String(v).trim() !== '')){
+        rows.push(row)
+      }
+      row = []
+      current = ''
+    }
+    else{
+      current += char
+    }
+  }
+  row.push(current)
+  if(row.some(v => String(v).trim() !== '')){
+    rows.push(row)
+  }
+  if(!rows.length) return []
+  const headers = rows[0].map(h => String(h).trim())
+  return rows.slice(1).map(r=>{
+    let obj = {}
+    headers.forEach((h,i)=>{
+      obj[h] = r[i] ?? ''
+    })
+    return obj
+  })
 }
 
 let charts = []
-
-function destroyCharts(){
-
-charts.forEach(c=>c.destroy())
-
-charts=[]
-
-}
+function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[] }
 
 function analyze(rows){
-
-let divNet = 0
-
-let monthly = {}
-
-let assets = {}
-
-let cash = num($('#initialCash').value)
-
-let cashSeries = []
-
-rows.forEach(r=>{
-
-const type =
-String(r.type || '').toUpperCase()
-
-const amount =
-num(r.amount)
-
-const tax =
-Math.abs(num(r.tax))
-
-const date =
-r.date || ''
-
-const month =
-date.slice(0,7)
-
-const name =
-r.name || r.symbol || 'N/D'
-
-if(type === 'DIVIDEND'){
-
-const net =
-Math.max(0,Math.abs(amount)-tax)
-
-divNet += net
-
-monthly[month] ??= 0
-monthly[month] += net
-
-assets[name] ??= 0
-assets[name] += net
-
-cash += net
-
-}
-else if(type === 'BUY'){
-
-cash -= Math.abs(amount)
-
-}
-else if(type.includes('TRANSFER_IN')){
-
-cash += Math.abs(amount)
-
-}
-else if(type === 'SELL'){
-
-cash += Math.abs(amount)
-
+  let divNet = 0
+  let monthly = {}
+  let assets = {}
+  let cash = num($('#initialCash').value)
+  let cashSeries = []
+  let invested = 0
+  rows.forEach(r=>{
+    const type = String(r.type || r.Type || '').toUpperCase()
+    const amount = num(r.amount || r.Amount)
+    const tax = Math.abs(num(r.tax || r.Tax))
+    const date = r.date || r.Date || ''
+    const month = date.slice(0,7) || 'Senza data'
+    const name = r.name || r.Name || r.symbol || r.Symbol || 'N/D'
+    if(type === 'DIVIDEND'){
+      const net = Math.max(0, Math.abs(amount) - tax)
+      divNet += net
+      monthly[month] ??= 0
+      monthly[month] += net
+      assets[name] ??= 0
+      assets[name] += net
+      cash += net
+    }
+    else if(type === 'INTEREST_PAYMENT'){
+      const net = Math.max(0, Math.abs(amount) - tax)
+      cash += net
+    }
+    else if(type === 'BUY'){
+      cash -= Math.abs(amount)
+      invested += Math.abs(amount)
+    }
+    else if(type.includes('TRANSFER_IN')){
+      cash += Math.abs(amount)
+      invested += Math.abs(amount)
+    }
+    else if(type === 'SELL'){
+      cash += Math.abs(amount)
+    }
+    else if(type.includes('TRANSFER_OUT')){
+      cash -= Math.abs(amount)
+    }
+    cashSeries.push({date,cash})
+  })
+  const avg = Object.keys(monthly).length ? divNet / Object.keys(monthly).length : 0
+  $('#kRows').textContent = rows.length
+  $('#kDiv').textContent = money(divNet)
+  $('#kCash').textContent = money(cash)
+  $('#kAvg').textContent = money(avg)
+  $('#kMort').textContent = ((avg/MORTGAGE)*100).toFixed(1)+'%'
+  $('#kInv').textContent = money(invested)
+  renderCharts(monthly,assets,cashSeries)
+  setStatus(
+    `✅ CSV letto correttamente.<br>Righe analizzate: <b>${rows.length}</b><br>Dividendi netti rilevati: <b>${money(divNet)}</b>`
+  )
 }
 
-cashSeries.push({
-date,
-cash
-})
-
-})
-
-const avg =
-Object.keys(monthly).length
-? divNet / Object.keys(monthly).length
-: 0
-
-$('#kDiv').textContent = money(divNet)
-
-$('#kCash').textContent = money(cash)
-
-$('#kAvg').textContent = money(avg)
-
-$('#kMort').textContent =
-((avg/MORTGAGE)*100).toFixed(1)+'%'
-
-destroyCharts()
-
-charts.push(
-new Chart($('#chartDiv'),{
-type:'bar',
-data:{
-labels:Object.keys(monthly),
-datasets:[{
-label:'Dividendi netti',
-data:Object.values(monthly)
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false
+function renderCharts(monthly,assets,cashSeries){
+  destroyCharts()
+  charts.push(new Chart($('#chartDiv'),{
+    type:'bar',
+    data:{labels:Object.keys(monthly),datasets:[{label:'Dividendi netti',data:Object.values(monthly)}]},
+    options:{responsive:true,maintainAspectRatio:false}
+  }))
+  const top = Object.entries(assets).sort((a,b)=>b[1]-a[1]).slice(0,10)
+  charts.push(new Chart($('#chartAssets'),{
+    type:'bar',
+    data:{labels:top.map(x=>x[0]),datasets:[{label:'Top pagatori',data:top.map(x=>x[1])}]},
+    options:{responsive:true,maintainAspectRatio:false}
+  }))
+  charts.push(new Chart($('#chartCash'),{
+    type:'line',
+    data:{labels:cashSeries.map(x=>x.date),datasets:[{label:'Cash stimato',data:cashSeries.map(x=>x.cash),tension:.35}]},
+    options:{responsive:true,maintainAspectRatio:false}
+  }))
 }
-})
-)
 
-const top =
-Object.entries(assets)
-.sort((a,b)=>b[1]-a[1])
-.slice(0,10)
-
-charts.push(
-new Chart($('#chartAssets'),{
-type:'bar',
-data:{
-labels:top.map(x=>x[0]),
-datasets:[{
-label:'Top pagatori',
-data:top.map(x=>x[1])
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false
-}
-})
-)
-
-charts.push(
-new Chart($('#chartCash'),{
-type:'line',
-data:{
-labels:cashSeries.map(x=>x.date),
-datasets:[{
-label:'Cash stimato',
-data:cashSeries.map(x=>x.cash),
-tension:.35
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false
-}
-})
-)
-
+function runAnalysisFromText(text){
+  if(!text.trim()){
+    alert('Inserisci o carica un CSV')
+    return
+  }
+  setStatus('⏳ Lettura CSV in corso...')
+  const rows = parseCSV(text)
+  if(!rows.length){
+    setStatus('❌ CSV vuoto o non leggibile.')
+    return
+  }
+  analyze(rows)
 }
 
 $('#parseBtn').onclick = ()=>{
-
-try{
-
-const txt = $('#rawInput').value
-
-if(!txt.trim()){
-
-alert('Inserisci o carica un CSV')
-
-return
-
-}
-
-const rows = parseCSV(txt)
-
-analyze(rows)
-
-}
-catch(err){
-
-console.error(err)
-
-alert(
-'Errore CSV:\\n'+
-(err.message || err)
-)
-
-}
-
+  try{
+    runAnalysisFromText($('#rawInput').value)
+  }catch(err){
+    console.error(err)
+    setStatus('❌ Errore CSV: '+(err.message || err))
+    alert('Errore CSV:\n'+(err.message || err))
+  }
 }
 
 $('#csvUpload').addEventListener('change', async e=>{
-
-try{
-
-const file = e.target.files[0]
-
-if(!file){
-return
-}
-
-const text = await file.text()
-
-$('#rawInput').value = text
-
-const rows = parseCSV(text)
-
-analyze(rows)
-
-}
-catch(err){
-
-console.error(err)
-
-alert(
-'Errore caricamento CSV:\\n'+
-(err.message || err)
-)
-
-}
-
+  try{
+    const file = e.target.files[0]
+    if(!file) return
+    setStatus('⏳ Caricamento file: '+file.name)
+    const text = await file.text()
+    $('#rawInput').value = text
+    runAnalysisFromText(text)
+  }catch(err){
+    console.error(err)
+    setStatus('❌ Errore caricamento CSV: '+(err.message || err))
+    alert('Errore caricamento CSV:\n'+(err.message || err))
+  }
 })
 
 $('#demoBtn').onclick = ()=>{
-
-const demo =
-`datetime,date,type,asset_class,name,symbol,amount,tax
-2026-01-01,2026-01-01,DIVIDEND,STOCK,BlackRock TCP Capital,US09259E1082,4.92,-1.83
-2026-02-01,2026-02-01,DIVIDEND,ETF,JPMorgan Global Equity Premium Income,IE0003UVYC20,7.77,-2.08
-2026-02-02,2026-02-02,BUY,ETF,JPMorgan Global Equity Premium Income,IE0003UVYC20,-100,0
-2026-03-02,2026-03-02,TRANSFER_IN,CASH,Deposit,,250,0`
-
-$('#rawInput').value = demo
-
-const rows = parseCSV(demo)
-
-analyze(rows)
-
+  const demo =
+`datetime,date,account_type,category,type,asset_class,name,symbol,shares,price,amount,fee,tax,currency
+2026-01-01,2026-01-01,DEFAULT,CASH,DIVIDEND,STOCK,BlackRock TCP Capital,US09259E1082,23.17,,4.92,,-1.83,EUR
+2026-02-01,2026-02-01,DEFAULT,CASH,DIVIDEND,ETF,JPMorgan Global Equity Premium Income,IE0003UVYC20,47.5,,7.77,,-2.08,EUR
+2026-02-02,2026-02-02,DEFAULT,TRADING,BUY,ETF,JPMorgan Global Equity Premium Income,IE0003UVYC20,4,25,-100,,0,EUR
+2026-03-02,2026-03-02,DEFAULT,CASH,TRANSFER_IN,,Deposit,,250,,250,,0,EUR`
+  $('#rawInput').value = demo
+  runAnalysisFromText(demo)
 }
-
 </script>
 
 </body>
