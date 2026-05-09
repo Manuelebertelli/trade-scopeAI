@@ -98,34 +98,33 @@ const $ = s => document.querySelector(s);
 
 // Formatta i numeri come valuta
 const money = n =>
-  new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0);
+  new Intl.NumberFormat('it-IT',{ style:'currency',currency:'EUR' }).format(Number(n)||0);
 
 // Aggiorna lo stato nel box di stato
-function setStatus(msg) {
+function setStatus(msg){
   $('#statusBox').innerHTML = msg;
 }
 
 // Converte stringhe numeriche con virgole/punti in numeri
-function num(v) {
-  if (v === null || v === undefined || v === '') return 0;
-  let s = String(v).trim().replace(/€/g, '').replace(/\s/g, '');
-  if (s.includes(',') && s.includes('.')) {
-    s = s.replace(/\./g, '').replace(',', '.');
-  } else if (s.includes(',')) {
-    s = s.replace(',', '.');
+function num(v){
+  if(v === null || v === undefined || v === '') return 0;
+  let s = String(v).trim().replace(/€/g,'').replace(/\s/g,'');
+  if(s.includes(',') && s.includes('.')){
+    s = s.replace(/\./g,'').replace(',','.');
+  } else if(s.includes(',')){
+    s = s.replace(',','.');
   }
   return parseFloat(s) || 0;
 }
 
 // Individua il delimitatore (virgola, punto e virgola o tab) dalla prima riga
-function detectDelimiter(text) {
+function detectDelimiter(text){
   const firstLine = (text || '').split(/\r?\n/).find(x => x.trim()) || '';
-  const delimiters = [',', ';', '\t'];
-  let best = ',';
-  let max = 0;
-  delimiters.forEach(d => {
+  const delimiters = [',',';','\t'];
+  let best = ',', max = 0;
+  delimiters.forEach(d =>{
     const count = firstLine.split(d).length;
-    if (count > max) {
+    if(count > max){
       max = count;
       best = d;
     }
@@ -134,60 +133,47 @@ function detectDelimiter(text) {
 }
 
 // Parser CSV robusto con gestione virgolette e BOM
-function parseCSV(text) {
-  text = (text || '').replace(/^\uFEFF/, '');
+function parseCSV(text){
+  text = (text || '').replace(/^\uFEFF/,'');
   const delimiter = detectDelimiter(text);
   const rows = [];
-  let row = [];
-  let current = '';
-  let insideQuotes = false;
-  for (let i = 0; i < text.length; i++) {
+  let row = [], current = '', insideQuotes = false;
+  for(let i=0;i<text.length;i++){
     const char = text[i];
-    const next = text[i + 1];
-    if (char === '"') {
-      if (insideQuotes && next === '"') {
+    const next = text[i+1];
+    if(char === '"'){
+      if(insideQuotes && next === '"'){
         current += '"';
         i++;
       } else {
         insideQuotes = !insideQuotes;
       }
-    } else if (char === delimiter && !insideQuotes) {
+    } else if(char === delimiter && !insideQuotes){
+      row.push(current); current = '';
+    } else if((char === '\n' || char === '\r') && !insideQuotes){
+      if(char === '\r' && next === '\n') i++;
       row.push(current);
-      current = '';
-    } else if ((char === '\n' || char === '\r') && !insideQuotes) {
-      if (char === '\r' && next === '\n') i++;
-      row.push(current);
-      if (row.some(v => String(v).trim() !== '')) {
-        rows.push(row);
-      }
-      row = [];
-      current = '';
+      if(row.some(v => String(v).trim() !== '')) rows.push(row);
+      row = []; current = '';
     } else {
       current += char;
     }
   }
   row.push(current);
-  if (row.some(v => String(v).trim() !== '')) {
-    rows.push(row);
-  }
-  if (!rows.length) return [];
+  if(row.some(v => String(v).trim() !== '')) rows.push(row);
+  if(!rows.length) return [];
   const headers = rows[0].map(h => String(h).trim());
   return rows.slice(1).map(r => {
     let obj = {};
-    headers.forEach((h, i) => {
-      obj[h] = r[i] ?? '';
-    });
+    headers.forEach((h,i) => { obj[h] = r[i] ?? ''; });
     return obj;
   });
 }
 
 let charts = [];
-function destroyCharts() {
-  charts.forEach(c => c.destroy());
-  charts = [];
-}
+function destroyCharts(){ charts.forEach(c => c.destroy()); charts = []; }
 
-function analyze(rows) {
+function analyze(rows){
   let divNet = 0;
   let monthly = {};
   let assets = {};
@@ -198,7 +184,6 @@ function analyze(rows) {
   let monthlyInv = {};
   let exposures = {};
   let exposuresAssets = {};
-  // Tracciamento per il costo medio
   let shareCount = {};
   let costBasisSum = {};
   let divMonthsCount = {};
@@ -208,11 +193,11 @@ function analyze(rows) {
     const amount = num(r.amount || r.Amount);
     const tax = Math.abs(num(r.tax || r.Tax));
     const date = r.date || r.Date || '';
-    const month = date.slice(0, 7) || 'Senza data';
+    const month = date.slice(0,7) || 'Senza data';
     const name = r.name || r.Name || r.symbol || r.Symbol || 'N/D';
     const assetClass = (r.asset_class || r.Asset_Class || r.assetClass || '').toUpperCase();
 
-    if (type === 'DIVIDEND') {
+    if(type === 'DIVIDEND'){
       const net = Math.max(0, Math.abs(amount) - tax);
       divNet += net;
       monthly[month] = (monthly[month] || 0) + net;
@@ -220,61 +205,60 @@ function analyze(rows) {
       const grossDiv = Math.abs(amount);
       assetsGross[name] = (assetsGross[name] || 0) + grossDiv;
       cash += net;
-      // Track months in which dividends were paid per asset
       divMonthsCount[name] = divMonthsCount[name] || {};
       divMonthsCount[name][month] = true;
-    } else if (type === 'INTEREST_PAYMENT') {
+    } else if(type === 'INTEREST_PAYMENT'){
       const net = Math.max(0, Math.abs(amount) - tax);
       cash += net;
-    } else if (type === 'BUY') {
+    } else if(type === 'BUY'){
       cash -= Math.abs(amount);
       invested += Math.abs(amount);
       monthlyInv[month] = (monthlyInv[month] || 0) + Math.abs(amount);
-      if (assetClass) {
+      if(assetClass){
         exposures[assetClass] = (exposures[assetClass] || 0) + Math.abs(amount);
       }
       exposuresAssets[name] = (exposuresAssets[name] || 0) + Math.abs(amount);
       const sh = num(r.shares || r.Shares);
-      if (sh > 0) {
+      if(sh > 0){
         const price = num(r.price || r.Price);
         shareCount[name] = (shareCount[name] || 0) + sh;
         costBasisSum[name] = (costBasisSum[name] || 0) + sh * price;
       }
-    } else if (type.includes('TRANSFER_IN')) {
+    } else if(type.includes('TRANSFER_IN')){
       cash += Math.abs(amount);
       invested += Math.abs(amount);
       monthlyInv[month] = (monthlyInv[month] || 0) + Math.abs(amount);
-      if (assetClass) {
+      if(assetClass){
         exposures[assetClass] = (exposures[assetClass] || 0) + Math.abs(amount);
       }
       exposuresAssets[name] = (exposuresAssets[name] || 0) + Math.abs(amount);
-    } else if (type === 'SELL') {
+    } else if(type === 'SELL'){
       cash += Math.abs(amount);
       monthlyInv[month] = (monthlyInv[month] || 0) - Math.abs(amount);
-      if (assetClass) {
+      if(assetClass){
         exposures[assetClass] = (exposures[assetClass] || 0) - Math.abs(amount);
       }
       exposuresAssets[name] = (exposuresAssets[name] || 0) - Math.abs(amount);
       const sh = num(r.shares || r.Shares);
-      if (sh > 0) {
+      if(sh > 0){
         const currentShares = shareCount[name] || 0;
         const currentCost = costBasisSum[name] || 0;
-        if (currentShares > 0) {
+        if(currentShares > 0){
           const avgCost = currentCost / currentShares;
           const costToRemove = avgCost * sh;
           costBasisSum[name] = currentCost - costToRemove;
           shareCount[name] = currentShares - sh;
         }
       }
-    } else if (type.includes('TRANSFER_OUT')) {
+    } else if(type.includes('TRANSFER_OUT')){
       cash -= Math.abs(amount);
       monthlyInv[month] = (monthlyInv[month] || 0) - Math.abs(amount);
-      if (assetClass) {
+      if(assetClass){
         exposures[assetClass] = (exposures[assetClass] || 0) - Math.abs(amount);
       }
       exposuresAssets[name] = (exposuresAssets[name] || 0) - Math.abs(amount);
     }
-    cashSeries.push({ date, cash });
+    cashSeries.push({date,cash});
   });
 
   const avg = Object.keys(monthly).length ? divNet / Object.keys(monthly).length : 0;
@@ -282,11 +266,11 @@ function analyze(rows) {
   $('#kDiv').textContent = money(divNet);
   $('#kCash').textContent = money(cash);
   $('#kAvg').textContent = money(avg);
-  $('#kMort').textContent = ((avg / MORTGAGE) * 100).toFixed(1) + '%';
+  $('#kMort').textContent = ((avg/MORTGAGE)*100).toFixed(1)+'%';
   $('#kInv').textContent = money(invested);
 
   let coverage = {};
-  for (const m in monthly) {
+  for(const m in monthly){
     coverage[m] = (monthly[m] / MORTGAGE) * 100;
   }
 
@@ -295,145 +279,162 @@ function analyze(rows) {
   setStatus(`✅ CSV letto correttamente.<br>Righe analizzate: <b>${rows.length}</b><br>Dividendi netti rilevati: <b>${money(divNet)}</b>`);
 }
 
-function renderCharts(monthly, assets, cashSeries, monthlyInv, coverage, exposures, exposuresAssets) {
+function renderCharts(monthly, assets, cashSeries, monthlyInv, coverage, exposures, exposuresAssets){
   destroyCharts();
-  charts.push(new Chart($('#chartDiv'), {
-    type: 'bar',
-    data: { labels: Object.keys(monthly), datasets: [{ label: 'Dividendi netti', data: Object.values(monthly) }] },
-    options: { responsive: true, maintainAspectRatio: false }
+  charts.push(new Chart($('#chartDiv'),{
+    type:'bar',
+    data:{ labels:Object.keys(monthly), datasets:[{label:'Dividendi netti', data:Object.values(monthly)} ] },
+    options:{ responsive:true, maintainAspectRatio:false }
   }));
-  const top = Object.entries(assets).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  charts.push(new Chart($('#chartAssets'), {
-    type: 'bar',
-    data: { labels: top.map(x => x[0]), datasets: [{ label: 'Top pagatori', data: top.map(x => x[1]) }] },
-    options: { responsive: true, maintainAspectRatio: false }
+  const top = Object.entries(assets).sort((a,b) => b[1]-a[1]).slice(0,10);
+  charts.push(new Chart($('#chartAssets'),{
+    type:'bar',
+    data:{ labels: top.map(x=>x[0]), datasets:[{label:'Top pagatori',data: top.map(x=>x[1])}] },
+    options:{ responsive:true, maintainAspectRatio:false }
   }));
-  charts.push(new Chart($('#chartCash'), {
-    type: 'line',
-    data: { labels: cashSeries.map(x => x.date), datasets: [{ label: 'Cash stimato', data: cashSeries.map(x => x.cash), tension: .35 }] },
-    options: { responsive: true, maintainAspectRatio: false }
+  charts.push(new Chart($('#chartCash'),{
+    type:'line',
+    data:{ labels: cashSeries.map(x=>x.date), datasets:[{label:'Cash stimato', data: cashSeries.map(x=>x.cash), tension:.35}] },
+    options:{ responsive:true, maintainAspectRatio:false }
   }));
-  if (monthlyInv && Object.keys(monthlyInv).length) {
-    charts.push(new Chart($('#chartInvest'), {
-      type: 'bar',
-      data: { labels: Object.keys(monthlyInv), datasets: [{ label: 'Investimenti netti', data: Object.values(monthlyInv) }] },
-      options: { responsive: true, maintainAspectRatio: false }
+  if(monthlyInv && Object.keys(monthlyInv).length){
+    charts.push(new Chart($('#chartInvest'),{
+      type:'bar',
+      data:{ labels:Object.keys(monthlyInv), datasets:[{label:'Investimenti netti', data:Object.values(monthlyInv)}] },
+      options:{ responsive:true, maintainAspectRatio:false }
     }));
   }
-  if (coverage && Object.keys(coverage).length) {
-    charts.push(new Chart($('#chartCoverage'), {
-      type: 'line',
-      data: { labels: Object.keys(coverage), datasets: [{ label: 'Copertura rata mutuo (%)', data: Object.values(coverage), tension: .35 }] },
-      options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => v + '%' }, min: 0 } } }
+  if(coverage && Object.keys(coverage).length){
+    charts.push(new Chart($('#chartCoverage'),{
+      type:'line',
+      data:{ labels:Object.keys(coverage), datasets:[{label:'Copertura rata mutuo (%)', data:Object.values(coverage), tension:.35}] },
+      options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ ticks:{ callback:v=>v+'%' }, min:0 } } }
     }));
   }
-  if (exposures && Object.keys(exposures).length) {
+  if(exposures && Object.keys(exposures).length){
     const labels = Object.keys(exposures);
     const data = labels.map(k => exposures[k]);
-    charts.push(new Chart($('#chartExposure'), {
-      type: 'bar',
-      data: { labels: labels, datasets: [{ label: 'Esposizione', data: data }] },
-      options: { responsive: true, maintainAspectRatio: false }
+    charts.push(new Chart($('#chartExposure'),{
+      type:'bar',
+      data:{ labels: labels, datasets:[{label:'Esposizione', data: data}] },
+      options:{ responsive:true, maintainAspectRatio:false }
     }));
   }
   updateRiskSummary(exposures, exposuresAssets);
 }
 
-function updateRiskSummary(exposures, exposuresAssets) {
+function updateRiskSummary(exposures, exposuresAssets){
   const el = document.getElementById('riskSummary');
-  if (!el) return;
-  if (!exposures || Object.keys(exposures).length === 0) {
+  if(!el){ return; }
+  if(!exposures || Object.keys(exposures).length === 0){
     el.innerHTML = 'Nessun dato di esposizione disponibile.';
     return;
   }
   let total = 0;
-  for (const k in exposures) {
+  for(const k in exposures){
     total += Math.max(0, exposures[k]);
   }
-  if (total <= 0) {
+  if(total <= 0){
     el.innerHTML = 'Esposizione totale nulla.';
     return;
   }
   const percList = [];
-  for (const k in exposures) {
+  for(const k in exposures){
     const val = Math.max(0, exposures[k]);
-    if (val <= 0) continue;
-    const p = (val / total) * 100;
+    if(val <= 0) continue;
+    const p = (val/total)*100;
     percList.push(`<li>${k}: <b>${p.toFixed(1)}%</b></li>`);
   }
-  const derivExp = Object.entries(exposures).filter(([k]) => k.includes('DERIV')).reduce((sum,[k,v]) => sum + Math.max(0,v),0);
-  const cryptoExp = Object.entries(exposures).filter(([k]) => k.includes('CRYPTO')).reduce((sum,[k,v]) => sum + Math.max(0,v),0);
-  const derivPct = derivExp / total;
-  const cryptoPct = cryptoExp / total;
+  const derivExp = Object.entries(exposures).filter(([k])=>k.includes('DERIV')).reduce((sum,[k,v])=>sum+Math.max(0,v),0);
+  const cryptoExp = Object.entries(exposures).filter(([k])=>k.includes('CRYPTO')).reduce((sum,[k,v])=>sum+Math.max(0,v),0);
+  const derivPct = derivExp/total;
+  const cryptoPct = cryptoExp/total;
   let exposuresAssetsTotal = 0;
-  for (const name in exposuresAssets) {
+  for(const name in exposuresAssets){
     exposuresAssetsTotal += Math.max(0, exposuresAssets[name]);
   }
   let topAsset = null;
   let topVal = 0;
-  for (const name in exposuresAssets) {
+  for(const name in exposuresAssets){
     const val = Math.max(0, exposuresAssets[name]);
-    if (val > topVal) {
+    if(val > topVal){
       topVal = val;
       topAsset = name;
     }
   }
   const topPct = exposuresAssetsTotal > 0 ? topVal / exposuresAssetsTotal : 0;
-
-  function riskColor(pct, thresholds) {
-    if (pct <= thresholds[0]) return '🟢';
-    if (pct <= thresholds[1]) return '🟡';
+  function riskColor(pct, thresholds){
+    if(pct <= thresholds[0]) return '🟢';
+    if(pct <= thresholds[1]) return '🟡';
     return '🔴';
   }
-  const derivColor = riskColor(derivPct, [0.05, 0.15]);
-  const cryptoColor = riskColor(cryptoPct, [0.05, 0.15]);
-  const topColor = riskColor(topPct, [0.3, 0.5]);
+  const derivColor = riskColor(derivPct, [0.05,0.15]);
+  const cryptoColor = riskColor(cryptoPct, [0.05,0.15]);
+  const topColor = riskColor(topPct, [0.3,0.5]);
   let html = '';
   html += '<p><b>Distribuzione per asset class</b></p>';
-  html += '<ul style="list-style:none;padding-left:0">' + percList.join('') + '</ul>';
-  html += '<p><b>Rischio derivati:</b> ' + derivColor + ' ' + (derivPct * 100).toFixed(1) + '%</p>';
-  html += '<p><b>Rischio crypto:</b> ' + cryptoColor + ' ' + (cryptoPct * 100).toFixed(1) + '%</p>';
-  if (topAsset) {
-    html += '<p><b>Concentrazione titolo principale:</b> ' + topColor + ' ' + topAsset + ' (' + (topPct * 100).toFixed(1) + '%)</p>';
+  html += '<ul style="list-style:none;padding-left:0">'+percList.join('')+'</ul>';
+  html += '<p><b>Rischio derivati:</b> '+derivColor+' '+(derivPct*100).toFixed(1)+'%</p>';
+  html += '<p><b>Rischio crypto:</b> '+cryptoColor+' '+(cryptoPct*100).toFixed(1)+'%</p>';
+  if(topAsset){
+    html += '<p><b>Concentrazione titolo principale:</b> '+topColor+' '+topAsset+' ('+(topPct*100).toFixed(1)+'%)</p>';
   }
   el.innerHTML = html;
 }
 
-// Aggiorna la tabella dei rendimenti dividendi per asset usando il costo medio (cost basis)
-function updateYieldTableCostBasis(assetsGross, assetsNet, shareCount, costBasisSum, divMonthsCount) {
+// Aggiorna la tabella dei rendimenti dividendi per asset usando il costo medio (cost basis) e la frequenza reale
+function updateYieldTableCostBasis(assetsGross, assetsNet, shareCount, costBasisSum, divMonthsCount){
   const el = document.getElementById('yieldTable');
-  if (!el) return;
+  if(!el) return;
   let rows = [];
-  for (const name in assetsNet) {
+  for(const name in assetsNet){
     const netDiv = assetsNet[name] || 0;
     const grossDiv = assetsGross[name] || 0;
     const shares = shareCount[name] || 0;
     const costSum = costBasisSum[name] || 0;
-    if (shares <= 0 || costSum <= 0 || netDiv <= 0) continue;
+    if(shares <= 0 || costSum <= 0 || netDiv <= 0) continue;
     const avgCost = costSum / shares;
-    const monthsCount = divMonthsCount && divMonthsCount[name] ? Object.keys(divMonthsCount[name]).length : 0;
-    const months = monthsCount > 0 ? monthsCount : 1;
-    const grossPerShare = grossDiv / shares;
-    const netPerShare = netDiv / shares;
-    const monthlyGross = (grossPerShare / avgCost) / months * 100;
-    const annualGross = monthlyGross * 12;
-    const monthlyNet = (netPerShare / avgCost) / months * 100;
-    const annualNet = monthlyNet * 12;
+    let freq = 1, monthsSpan = 0, nDivs = 0;
+    if(divMonthsCount && divMonthsCount[name]){
+      const keys = Object.keys(divMonthsCount[name]).filter(m => m && m.includes('-'));
+      nDivs = keys.length;
+      if(nDivs > 1){
+        keys.sort((a,b) => {
+          const [ay, am] = a.split('-').map(Number);
+          const [by, bm] = b.split('-').map(Number);
+          return ay === by ? am - bm : ay - by;
+        });
+        const first = keys[0];
+        const last = keys[keys.length - 1];
+        const [fy, fm] = first.split('-').map(Number);
+        const [ly, lm] = last.split('-').map(Number);
+        monthsSpan = (ly - fy)*12 + (lm - fm);
+        if(monthsSpan <= 0) monthsSpan = 1;
+        freq = 12 * (nDivs - 1) / monthsSpan;
+      } else if(nDivs === 1){
+        freq = 1;
+      }
+    }
+    if(nDivs === 0) continue;
+    const annualGross = (grossDiv * freq) / (nDivs * costSum) * 100;
+    const annualNet = (netDiv * freq) / (nDivs * costSum) * 100;
+    const monthlyGross = annualGross / 12;
+    const monthlyNet = annualNet / 12;
     rows.push({ name, annualGross, monthlyGross, annualNet, monthlyNet });
   }
-  if (rows.length === 0) {
+  if(rows.length === 0){
     el.innerHTML = 'Nessun asset con dividendi e investimento positivo.';
     return;
   }
-  rows.sort((a, b) => b.annualNet - a.annualNet);
+  rows.sort((a,b) => b.annualNet - a.annualNet);
   let html = '<table><thead><tr><th>Asset</th><th style="text-align:right">Lordo ann.</th><th style="text-align:right">Lordo mese</th><th style="text-align:right">Netto ann.</th><th style="text-align:right">Netto mese</th></tr></thead><tbody>';
   rows.forEach(r => {
     html += '<tr>';
-    html += '<td>' + r.name + '</td>';
-    html += '<td>' + r.annualGross.toFixed(2) + '%</td>';
-    html += '<td>' + r.monthlyGross.toFixed(2) + '%</td>';
-    html += '<td>' + r.annualNet.toFixed(2) + '%</td>';
-    html += '<td>' + r.monthlyNet.toFixed(2) + '%</td>';
+    html += '<td>'+r.name+'</td>';
+    html += '<td>'+r.annualGross.toFixed(2)+'%</td>';
+    html += '<td>'+r.monthlyGross.toFixed(2)+'%</td>';
+    html += '<td>'+r.annualNet.toFixed(2)+'%</td>';
+    html += '<td>'+r.monthlyNet.toFixed(2)+'%</td>';
     html += '</tr>';
   });
   html += '</tbody></table>';
@@ -441,14 +442,14 @@ function updateYieldTableCostBasis(assetsGross, assetsNet, shareCount, costBasis
 }
 
 // Esegue l’analisi a partire dal testo del CSV
-function runAnalysisFromText(text) {
-  if (!text.trim()) {
+function runAnalysisFromText(text){
+  if(!text.trim()){
     alert('Inserisci o carica un CSV');
     return;
   }
   setStatus('⏳ Lettura CSV in corso...');
   const rows = parseCSV(text);
-  if (!rows.length) {
+  if(!rows.length){
     setStatus('❌ CSV vuoto o non leggibile.');
     return;
   }
@@ -456,40 +457,40 @@ function runAnalysisFromText(text) {
 }
 
 $('#parseBtn').onclick = () => {
-  try {
+  try{
     runAnalysisFromText($('#rawInput').value);
-  } catch (err) {
+  } catch(err){
     console.error(err);
-    setStatus('❌ Errore CSV: ' + (err.message || err));
-    alert('Errore CSV:\n' + (err.message || err));
+    setStatus('❌ Errore CSV: '+(err.message || err));
+    alert('Errore CSV:\n'+(err.message || err));
   }
 };
 
 $('#csvUpload').addEventListener('change', async e => {
-  try {
+  try{
     const files = e.target.files;
-    if (!files || files.length === 0) return;
+    if(!files || files.length === 0) return;
     setStatus('⏳ Caricamento file...');
     let combined = '';
-    for (let i = 0; i < files.length; i++) {
+    for(let i=0; i<files.length; i++){
       const file = files[i];
       const text = await file.text();
       let cleaned = text;
-      if (i > 0) {
+      if(i > 0){
         const lines = text.split(/\r?\n/);
-        if (lines.length > 1) {
+        if(lines.length > 1){
           cleaned = lines.slice(1).join('\n');
         }
       }
-      if (i > 0) combined += '\n';
+      if(i > 0) combined += '\n';
       combined += cleaned;
     }
     $('#rawInput').value = combined;
     runAnalysisFromText(combined);
-  } catch (err) {
+  } catch(err){
     console.error(err);
-    setStatus('❌ Errore caricamento CSV: ' + (err.message || err));
-    alert('Errore caricamento CSV:\n' + (err.message || err));
+    setStatus('❌ Errore caricamento CSV: '+(err.message || err));
+    alert('Errore caricamento CSV:\n'+(err.message || err));
   }
 });
 
