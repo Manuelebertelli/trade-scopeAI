@@ -95,6 +95,11 @@ textarea{min-height:160px;resize:vertical}
   <div id="riskSummary" class="status"></div>
 </div>
 
+<div class="card">
+  <h3>Rendimenti dividendi per asset</h3>
+  <div id="yieldTable" class="status"></div>
+</div>
+
 </main>
 
 <script>
@@ -191,14 +196,13 @@ function parseCSV(text){
 }
 
 let charts = []
-// Distrugge i grafici precedenti prima di disegnarne di nuovi
 function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[] }
 
-// Analizza le righe del CSV e calcola KPI e serie dati per i grafici
 function analyze(rows){
   let divNet = 0
   let monthly = {}
   let assets = {}
+  let assetsGross = {}
   let cash = num($('#initialCash').value)
   let cashSeries = []
   let invested = 0
@@ -222,6 +226,10 @@ function analyze(rows){
       monthly[month] += net
       assets[name] ??= 0
       assets[name] += net
+      // accumulate gross dividend
+      const grossDiv = Math.abs(amount)
+      assetsGross[name] ??= 0
+      assetsGross[name] += grossDiv
       cash += net
     }
     else if(type === 'INTEREST_PAYMENT'){
@@ -231,11 +239,8 @@ function analyze(rows){
     else if(type === 'BUY'){
       cash -= Math.abs(amount)
       invested += Math.abs(amount)
-
-      // accumulate positive investment for buys per month
       monthlyInv[month] ??= 0
       monthlyInv[month] += Math.abs(amount)
-
       // accumulate exposure for asset class and asset name
       if(assetClass){
         exposures[assetClass] ??= 0
@@ -247,11 +252,8 @@ function analyze(rows){
     else if(type.includes('TRANSFER_IN')){
       cash += Math.abs(amount)
       invested += Math.abs(amount)
-
-      // deposits count as positive investments
       monthlyInv[month] ??= 0
       monthlyInv[month] += Math.abs(amount)
-
       if(assetClass){
         exposures[assetClass] ??= 0
         exposures[assetClass] += Math.abs(amount)
@@ -261,13 +263,10 @@ function analyze(rows){
     }
     else if(type === 'SELL'){
       cash += Math.abs(amount)
-
-      // sells reduce investment
       monthlyInv[month] ??= 0
       monthlyInv[month] -= Math.abs(amount)
-
       if(assetClass){
-        exposures[assetClass] ??= 0
+      exposures[assetClass] ??= 0
         exposures[assetClass] -= Math.abs(amount)
       }
       exposuresAssets[name] ??= 0
@@ -275,11 +274,8 @@ function analyze(rows){
     }
     else if(type.includes('TRANSFER_OUT')){
       cash -= Math.abs(amount)
-
-      // withdrawals reduce investment
       monthlyInv[month] ??= 0
       monthlyInv[month] -= Math.abs(amount)
-
       if(assetClass){
         exposures[assetClass] ??= 0
         exposures[assetClass] -= Math.abs(amount)
@@ -302,12 +298,13 @@ function analyze(rows){
     coverage[m] = monthly[m] / MORTGAGE * 100
   }
   renderCharts(monthly,assets,cashSeries,monthlyInv,coverage,exposures,exposuresAssets)
+  // aggiorna la tabella dei rendimenti dividendi per asset
+  updateYieldTable(assetsGross, assets, exposuresAssets)
   setStatus(
     `✅ CSV letto correttamente.<br>Righe analizzate: <b>${rows.length}</b><br>Dividendi netti rilevati: <b>${money(divNet)}</b>`
   )
 }
 
-// Disegna i grafici (dividendi netti, top pagatori, cash stimato, investimenti netti, copertura e esposizione)
 function renderCharts(monthly, assets, cashSeries, monthlyInv, coverage, exposures, exposuresAssets){
   destroyCharts()
   // Dividendi netti mensili
@@ -347,6 +344,7 @@ function renderCharts(monthly, assets, cashSeries, monthlyInv, coverage, exposur
   }
   // Esposizione per asset class
   if(exposures && Object.keys(exposures).length){
+    // consider only positive exposures
     const labels = Object.keys(exposures)
     const data = labels.map(k => exposures[k])
     charts.push(new Chart($('#chartExposure'),{
@@ -419,7 +417,7 @@ function updateRiskSummary(exposures, exposuresAssets){
   // Compose HTML
   let html = ''
   html += '<p><b>Distribuzione per asset class</b></p>'
-  html += '<ul style=\"list-style:none;padding-left:0\">'+percList.join('')+'</ul>'
+  html += '<ul style="list-style:none;padding-left:0">'+percList.join('')+'</ul>'
   html += '<p><b>Rischio derivati:</b> '+derivColor+' '+(derivPct*100).toFixed(1)+'%</p>'
   html += '<p><b>Rischio crypto:</b> '+cryptoColor+' '+(cryptoPct*100).toFixed(1)+'%</p>'
   if(topAsset){
@@ -428,7 +426,48 @@ function updateRiskSummary(exposures, exposuresAssets){
   el.innerHTML = html
 }
 
-// Esegue l’analisi a partire dal testo del CSV
+// Crea la tabella dei rendimenti dividendi per asset
+function updateYieldTable(assetsGross, assetsNet, exposuresAssets){
+  const el = document.getElementById('yieldTable')
+  if(!el) return
+  // prepara la tabella
+  let rows = []
+  for(const name in assetsNet){
+    const netDiv = assetsNet[name] || 0
+    const grossDiv = assetsGross[name] || 0
+    const exposure = exposuresAssets[name] || 0
+    if(netDiv <= 0 || exposure <= 0) continue
+    const annualGross = (grossDiv / exposure) * 100
+    const monthlyGross = annualGross / 12
+    const annualNet = (netDiv / exposure) * 100
+    const monthlyNet = annualNet / 12
+    rows.push({name,annualGross,monthlyGross,annualNet,monthlyNet})
+  }
+  if(rows.length === 0){
+    el.innerHTML = 'Nessun asset con dividendi e investimento positivo.'
+    return
+  }
+  // ordina per rendimento netto annuo decrescente
+  rows.sort((a,b) => b.annualNet - a.annualNet)
+  let html = '<table style="width:100%;border-collapse:collapse;font-size:12px">'
+  html += '<thead><tr><th style="text-align:left;padding:6px;border-bottom:1px solid #ffffff33">Asset</th>'
+  html += '<th style="text-align:right;padding:6px;border-bottom:1px solid #ffffff33">Lordo ann.</th>'
+  html += '<th style="text-align:right;padding:6px;border-bottom:1px solid #ffffff33">Lordo mese</th>'
+  html += '<th style="text-align:right;padding:6px;border-bottom:1px solid #ffffff33">Netto ann.</th>'
+  html += '<th style="text-align:right;padding:6px;border-bottom:1px solid #ffffff33">Netto mese</th></tr></thead><tbody>'
+  rows.forEach(r=>{
+    html += '<tr>'
+    html += '<td style="padding:6px;border-bottom:1px solid #ffffff18">'+r.name+'</td>'
+    html += '<td style="padding:6px;border-bottom:1px solid #ffffff18;text-align:right">'+r.annualGross.toFixed(2)+'%</td>'
+    html += '<td style="padding:6px;border-bottom:1px solid #ffffff18;text-align:right">'+r.monthlyGross.toFixed(2)+'%</td>'
+    html += '<td style="padding:6px;border-bottom:1px solid #ffffff18;text-align:right">'+r.annualNet.toFixed(2)+'%</td>'
+    html += '<td style="padding:6px;border-bottom:1px solid #ffffff18;text-align:right">'+r.monthlyNet.toFixed(2)+'%</td>'
+    html += '</tr>'
+  })
+  html += '</tbody></table>'
+  el.innerHTML = html
+}
+
 function runAnalysisFromText(text){
   if(!text.trim()){
     alert('Inserisci o carica un CSV')
@@ -466,12 +505,12 @@ $('#csvUpload').addEventListener('change', async e=>{
       // Remove header from subsequent files
       let cleaned = text
       if(i > 0){
-        const lines = text.split(/\\r?\\n/)
+        const lines = text.split(/\r?\n/)
         if(lines.length > 1){
-          cleaned = lines.slice(1).join('\\n')
+          cleaned = lines.slice(1).join('\n')
         }
       }
-      if(i > 0) combined += '\\n'
+      if(i > 0) combined += '\n'
       combined += cleaned
     }
     $('#rawInput').value = combined
