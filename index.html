@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TradeScope AI v1.3</title>
+<title>TradeScope AI v1.3.1</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -55,6 +55,11 @@ margin-right:8px;
 margin-top:8px;
 }
 
+.btn.secondary{
+background:#223450;
+color:white;
+}
+
 .chartbox{
 height:320px;
 margin-top:14px;
@@ -80,6 +85,14 @@ color:#98a7bb;
 .box strong{
 font-size:20px;
 }
+
+.filebox{
+border:1px dashed #d9b56d88;
+background:#d9b56d12;
+padding:14px;
+border-radius:14px;
+margin-top:12px;
+}
 </style>
 </head>
 
@@ -89,7 +102,7 @@ font-size:20px;
 
 <div class="card">
 
-<h1>TradeScope AI v1.3</h1>
+<h1>TradeScope AI v1.3.1</h1>
 
 <p>
 Dashboard Trade Republic con:
@@ -104,15 +117,31 @@ id="initialCash"
 type="number"
 placeholder="Saldo cash iniziale">
 
+<div class="filebox">
+<label for="csvUpload">
+<b>📄 Carica CSV Trade Republic</b><br>
+<span style="color:#98a7bb;font-size:14px">
+Seleziona il file CSV dal tuo iPhone / PC
+</span>
+</label>
+
 <br><br>
+
+<input
+id="csvUpload"
+type="file"
+accept=".csv,text/csv">
+</div>
+
+<br>
 
 <textarea
 id="rawInput"
-placeholder="Incolla qui il CSV Trade Republic"></textarea>
+placeholder="Oppure incolla qui il CSV Trade Republic"></textarea>
 
 <br><br>
 
-<button class="btn" id="demoBtn">
+<button class="btn secondary" id="demoBtn">
 Demo
 </button>
 
@@ -397,7 +426,7 @@ const txt = $('#rawInput').value
 
 if(!txt.trim()){
 
-alert('Inserisci un CSV')
+alert('Inserisci o carica un CSV')
 
 return
 
@@ -420,6 +449,38 @@ alert(
 }
 
 }
+
+$('#csvUpload').addEventListener('change', async e=>{
+
+try{
+
+const file = e.target.files[0]
+
+if(!file){
+return
+}
+
+const text = await file.text()
+
+$('#rawInput').value = text
+
+const rows = parseCSV(text)
+
+analyze(rows)
+
+}
+catch(err){
+
+console.error(err)
+
+alert(
+'Errore caricamento CSV:\\n'+
+(err.message || err)
+)
+
+}
+
+})
 
 $('#demoBtn').onclick = ()=>{
 
