@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TradeScope AI v1.3.2</title>
+<title>TradeScope AI v1.3.3</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
 body{margin:0;font-family:Arial,sans-serif;background:#07111f;color:white}
@@ -26,7 +26,7 @@ textarea{min-height:160px;resize:vertical}
 <main>
 
 <div class="card">
-<h1>TradeScope AI v1.3.2</h1>
+<h1>TradeScope AI v1.3.3</h1>
 <p>Dashboard Trade Republic con upload CSV, parser robusto, dividendi netti e grafici.</p>
 
 <input id="initialCash" type="number" placeholder="Saldo cash iniziale">
@@ -75,19 +75,29 @@ textarea{min-height:160px;resize:vertical}
 <div class="chartbox"><canvas id="chartCash"></canvas></div>
 </div>
 
+<!-- Nuovo grafico per investimenti netti mensili -->
+<div class="card">
+  <h3>Investimenti netti mensili</h3>
+  <div class="chartbox"><canvas id="chartInvest"></canvas></div>
+</div>
+
 </main>
 
 <script>
+// Costante per la rata del mutuo
 const MORTGAGE = 650
 const $ = s => document.querySelector(s)
 
+// Formatta i numeri come valuta
 const money = n =>
 new Intl.NumberFormat('it-IT',{style:'currency',currency:'EUR'}).format(Number(n)||0)
 
+// Aggiorna lo stato nel box di stato
 function setStatus(msg){
   $('#statusBox').innerHTML = msg
 }
 
+// Converte stringhe numeriche con virgole/punti in numeri
 function num(v){
   if(v === null || v === undefined || v === '') return 0
   let s = String(v).trim().replace(/€/g,'').replace(/\s/g,'')
@@ -99,6 +109,7 @@ function num(v){
   return parseFloat(s) || 0
 }
 
+// Individua il delimitatore (virgola, punto e virgola o tab) dalla prima riga
 function detectDelimiter(text){
   const firstLine = (text || '').split(/\r?\n/).find(x => x.trim()) || ''
   const delimiters = [',',';','\t']
@@ -114,8 +125,9 @@ function detectDelimiter(text){
   return best
 }
 
+// Parser CSV robusto con gestione virgolette e BOM
 function parseCSV(text){
-  text = (text || '').replace(/^\uFEFF/,'')
+  text = (text || '').replace(/^\uFEFF/, '')
   const delimiter = detectDelimiter(text)
   const rows = []
   let row = []
@@ -165,8 +177,10 @@ function parseCSV(text){
 }
 
 let charts = []
+// Distrugge i grafici precedenti prima di disegnarne di nuovi
 function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[] }
 
+// Analizza le righe del CSV e calcola KPI e serie dati per i grafici
 function analyze(rows){
   let divNet = 0
   let monthly = {}
@@ -174,6 +188,7 @@ function analyze(rows){
   let cash = num($('#initialCash').value)
   let cashSeries = []
   let invested = 0
+  let monthlyInv = {}
   rows.forEach(r=>{
     const type = String(r.type || r.Type || '').toUpperCase()
     const amount = num(r.amount || r.Amount)
@@ -197,16 +212,24 @@ function analyze(rows){
     else if(type === 'BUY'){
       cash -= Math.abs(amount)
       invested += Math.abs(amount)
+      monthlyInv[month] ??= 0
+      monthlyInv[month] += Math.abs(amount)
     }
     else if(type.includes('TRANSFER_IN')){
       cash += Math.abs(amount)
       invested += Math.abs(amount)
+      monthlyInv[month] ??= 0
+      monthlyInv[month] += Math.abs(amount)
     }
     else if(type === 'SELL'){
       cash += Math.abs(amount)
+      monthlyInv[month] ??= 0
+      monthlyInv[month] -= Math.abs(amount)
     }
     else if(type.includes('TRANSFER_OUT')){
       cash -= Math.abs(amount)
+      monthlyInv[month] ??= 0
+      monthlyInv[month] -= Math.abs(amount)
     }
     cashSeries.push({date,cash})
   })
@@ -217,13 +240,12 @@ function analyze(rows){
   $('#kAvg').textContent = money(avg)
   $('#kMort').textContent = ((avg/MORTGAGE)*100).toFixed(1)+'%'
   $('#kInv').textContent = money(invested)
-  renderCharts(monthly,assets,cashSeries)
-  setStatus(
-    `✅ CSV letto correttamente.<br>Righe analizzate: <b>${rows.length}</b><br>Dividendi netti rilevati: <b>${money(divNet)}</b>`
-  )
+  renderCharts(monthly,assets,cashSeries,monthlyInv)
+  setStatus(`✅ CSV letto correttamente.<br>Righe analizzate: <b>${rows.length}</b><br>Dividendi netti rilevati: <b>${money(divNet)}</b>`)
 }
 
-function renderCharts(monthly,assets,cashSeries){
+// Disegna i grafici (dividendi netti, top pagatori, cash stimato e investimenti netti)
+function renderCharts(monthly,assets,cashSeries,monthlyInv){
   destroyCharts()
   charts.push(new Chart($('#chartDiv'),{
     type:'bar',
@@ -241,8 +263,16 @@ function renderCharts(monthly,assets,cashSeries){
     data:{labels:cashSeries.map(x=>x.date),datasets:[{label:'Cash stimato',data:cashSeries.map(x=>x.cash),tension:.35}]},
     options:{responsive:true,maintainAspectRatio:false}
   }))
+  if(monthlyInv && Object.keys(monthlyInv).length){
+    charts.push(new Chart($('#chartInvest'),{
+      type:'bar',
+      data:{labels:Object.keys(monthlyInv),datasets:[{label:'Investimenti netti',data:Object.values(monthlyInv)}]},
+      options:{responsive:true,maintainAspectRatio:false}
+    }))
+  }
 }
 
+// Esegue l’analisi a partire dal testo del CSV
 function runAnalysisFromText(text){
   if(!text.trim()){
     alert('Inserisci o carica un CSV')
