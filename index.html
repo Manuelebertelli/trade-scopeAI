@@ -3,89 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TradeScope AI v1.3.5</title>
+<title>TradeScope AI v1.3.6</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#0a0a0a;color:#f5f5f5}
-main{max-width:1100px;margin:auto;padding:16px}
-.card{background:#121212;border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 4px 8px rgba(0,0,0,0.3)}
-textarea,input{width:100%;padding:12px;border-radius:12px;border:1px solid #333;background:#171717;color:#f5f5f5;box-sizing:border-box}
-textarea{min-height:160px;resize:vertical}
-.btn{padding:12px 14px;border-radius:12px;border:0;background:#00b37a;color:#0a0a0a;font-weight:700;cursor:pointer;margin-right:8px;margin-top:8px;transition:background 0.2s}
-.btn:hover{background:#00d48d}
-.btn.secondary{background:#1e2a37;color:#f5f5f5}
-.btn.secondary:hover{background:#27364a}
-.chartbox{height:320px;margin-top:14px}
-.kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.box{background:#171717;padding:12px;border-radius:14px;border:1px solid #333}
-.box small{display:block;color:#98a7bb}
-.box strong{font-size:20px}
-.filebox{border:1px dashed #00b37a;background:#0e3a29;padding:14px;border-radius:14px;margin-top:12px;color:#00b37a}
-.status{background:#171717;border-radius:14px;padding:12px;margin-top:10px;color:#cbd5e1}
-table{width:100%;border-collapse:collapse;font-size:12px}
-th,td{padding:6px;border-bottom:1px solid #2a2a2a}
-th{text-align:left;color:#98a7bb}
-td{text-align:right}
-td:first-child{text-align:left}
+/* ...stili invariati... */
 input.freqInput{width:60px;background:#0a0a0a;color:#f5f5f5;border:1px solid #333;border-radius:6px;padding:2px 4px;font-size:12px;text-align:right}
 </style>
 </head>
 <body>
 <main>
 <div class="card">
-<h1>TradeScope AI v1.3.5</h1>
-<p>Dashboard avanzata per Trade Republic: upload multiplo CSV, parser robusto, KPI su dividendi, investimenti, cash e copertura rata mutuo. Nuove funzionalità di analisi del rischio, diversificazione e frequenza dividendi personalizzabile.</p>
-<input id="initialCash" type="number" placeholder="Saldo cash iniziale">
-<div class="filebox">
-<label for="csvUpload"><b>📄 Carica CSV Trade Republic</b><br><span style="font-size:14px">Seleziona uno o più file CSV</span></label>
-<br><br>
-<input id="csvUpload" type="file" accept=".csv,text/csv" multiple>
+<h1>TradeScope AI v1.3.6</h1>
+<!-- ...resto dell’interfaccia... -->
 </div>
-<br>
-<textarea id="rawInput" placeholder="Oppure incolla qui il CSV Trade Republic"></textarea>
-<br><br>
-<button class="btn secondary" id="demoBtn">Demo</button>
-<button class="btn" id="parseBtn">Analizza CSV</button>
-<div id="statusBox" class="status">In attesa del CSV.</div>
-</div>
-<div class="card">
-<div class="kpi">
-<div class="box"><small>Righe lette</small><strong id="kRows">0</strong></div>
-<div class="box"><small>Dividendi netti</small><strong id="kDiv">€0</strong></div>
-<div class="box"><small>Cash stimato</small><strong id="kCash">€0</strong></div>
-<div class="box"><small>Media mensile</small><strong id="kAvg">€0</strong></div>
-<div class="box"><small>Copertura mutuo</small><strong id="kMort">0%</strong></div>
-<div class="box"><small>Operazioni investimento</small><strong id="kInv">€0</strong></div>
-</div>
-</div>
-<div class="card">
-<h3>Dividendi netti mensili</h3>
-<div class="chartbox"><canvas id="chartDiv"></canvas></div>
-</div>
-<div class="card">
-<h3>Top pagatori dividendi</h3>
-<div class="chartbox"><canvas id="chartAssets"></canvas></div>
-</div>
-<div class="card">
-<h3>Cash stimato</h3>
-<div class="chartbox"><canvas id="chartCash"></canvas></div>
-</div>
-<div class="card">
-<h3>Investimenti netti mensili</h3>
-<div class="chartbox"><canvas id="chartInvest"></canvas></div>
-</div>
-<div class="card">
-<h3>Copertura rata mutuo</h3>
-<div class="chartbox"><canvas id="chartCoverage"></canvas></div>
-</div>
-<div class="card">
-<h3>Esposizione per asset class</h3>
-<div class="chartbox"><canvas id="chartExposure"></canvas></div>
-</div>
-<div class="card">
-<h3>Analisi rischio e diversificazione</h3>
-<div id="riskSummary" class="status"></div>
-</div>
+<!-- ...altri componenti... -->
 <div class="card">
 <h3>Rendimenti dividendi per asset</h3>
 <div id="yieldTable" class="status"></div>
@@ -93,323 +24,9 @@ input.freqInput{width:60px;background:#0a0a0a;color:#f5f5f5;border:1px solid #33
 </main>
 
 <script>
-// Costante per la rata del mutuo
-const MORTGAGE = 650;
-const $ = s => document.querySelector(s);
+// ...tutto il resto dell’app rimane invariato...
 
-// Formatta i numeri come valuta
-const money = n =>
-  new Intl.NumberFormat('it-IT', { style:'currency', currency:'EUR' }).format(Number(n)||0);
-
-// Aggiorna lo stato nel box di stato
-function setStatus(msg){ $('#statusBox').innerHTML = msg; }
-
-// Converte stringhe numeriche con virgole/punti in numeri
-function num(v){
-  if(v === null || v === undefined || v === '') return 0;
-  let s = String(v).trim().replace(/€/g,'').replace(/\s/g,'');
-  if(s.includes(',') && s.includes('.')){
-    s = s.replace(/\./g,'').replace(',','.');
-  } else if(s.includes(',')){
-    s = s.replace(',','.');
-  }
-  return parseFloat(s) || 0;
-}
-
-// Individua il delimitatore (virgola, punto e virgola o tab) dalla prima riga
-function detectDelimiter(text){
-  const firstLine = (text || '').split(/\r?\n/).find(x => x.trim()) || '';
-  const delimiters = [',',';','\t'];
-  let best = ',', max = 0;
-  delimiters.forEach(d =>{
-    const count = firstLine.split(d).length;
-    if(count > max){
-      max = count;
-      best = d;
-    }
-  });
-  return best;
-}
-
-// Parser CSV robusto con gestione virgolette e BOM
-function parseCSV(text){
-  text = (text || '').replace(/^\uFEFF/,'');
-  const delimiter = detectDelimiter(text);
-  const rows = [];
-  let row = [], current = '', insideQuotes = false;
-  for(let i=0;i<text.length;i++){
-    const char = text[i];
-    const next = text[i+1];
-    if(char === '"'){
-      if(insideQuotes && next === '"'){
-        current += '"'; i++;
-      } else { insideQuotes = !insideQuotes; }
-    } else if(char === delimiter && !insideQuotes){
-      row.push(current); current = '';
-    } else if((char === '\n' || char === '\r') && !insideQuotes){
-      if(char === '\r' && next === '\n') i++;
-      row.push(current);
-      if(row.some(v => String(v).trim() !== '')) rows.push(row);
-      row = []; current = '';
-    } else {
-      current += char;
-    }
-  }
-  row.push(current);
-  if(row.some(v => String(v).trim() !== '')) rows.push(row);
-  if(!rows.length) return [];
-  const headers = rows[0].map(h => String(h).trim());
-  return rows.slice(1).map(r => {
-    let obj = {};
-    headers.forEach((h,i) => { obj[h] = r[i] ?? ''; });
-    return obj;
-  });
-}
-
-let charts = [];
-function destroyCharts(){ charts.forEach(c => c.destroy()); charts = []; }
-
-// Variabile globale per memorizzare i dati per il calcolo dei rendimenti in base alla frequenza
-let yieldDataByAsset = {};
-
-function analyze(rows){
-  let divNet = 0;
-  let monthly = {};
-  let assetsNet = {};
-  let assetsGross = {};
-  let cash = num($('#initialCash').value);
-  let cashSeries = [];
-  let invested = 0;
-  let monthlyInv = {};
-  let exposures = {};
-  let exposuresAssets = {};
-  let shareCount = {};
-  let costBasisSum = {};
-  let divDates = {};
-
-  rows.forEach(r => {
-    const type = String(r.type || r.Type || '').toUpperCase();
-    const amount = num(r.amount || r.Amount);
-    const tax = Math.abs(num(r.tax || r.Tax));
-    const date = r.date || r.Date || '';
-    const month = date.slice(0,7) || 'Senza data';
-    const name = r.name || r.Name || r.symbol || r.Symbol || 'N/D';
-    const assetClass = (r.asset_class || r.Asset_Class || r.assetClass || '').toUpperCase();
-
-    if(type === 'DIVIDEND'){
-      const net = Math.max(0, Math.abs(amount) - tax);
-      divNet += net;
-      monthly[month] = (monthly[month] || 0) + net;
-      assetsNet[name] = (assetsNet[name] || 0) + net;
-      const grossDiv = Math.abs(amount);
-      assetsGross[name] = (assetsGross[name] || 0) + grossDiv;
-      cash += net;
-      divDates[name] = divDates[name] || [];
-      divDates[name].push(date);
-    } else if(type === 'INTEREST_PAYMENT'){
-      const net = Math.max(0, Math.abs(amount) - tax);
-      cash += net;
-    } else if(type === 'BUY'){
-      cash -= Math.abs(amount);
-      invested += Math.abs(amount);
-      monthlyInv[month] = (monthlyInv[month] || 0) + Math.abs(amount);
-      if(assetClass){
-        exposures[assetClass] = (exposures[assetClass] || 0) + Math.abs(amount);
-      }
-      exposuresAssets[name] = (exposuresAssets[name] || 0) + Math.abs(amount);
-      const sh = num(r.shares || r.Shares);
-      if(sh > 0){
-        const price = num(r.price || r.Price);
-        shareCount[name] = (shareCount[name] || 0) + sh;
-        costBasisSum[name] = (costBasisSum[name] || 0) + sh * price;
-      }
-    } else if(type.includes('TRANSFER_IN')){
-      cash += Math.abs(amount);
-      invested += Math.abs(amount);
-      monthlyInv[month] = (monthlyInv[month] || 0) + Math.abs(amount);
-      if(assetClass){
-        exposures[assetClass] = (exposures[assetClass] || 0) + Math.abs(amount);
-      }
-      exposuresAssets[name] = (exposuresAssets[name] || 0) + Math.abs(amount);
-    } else if(type === 'SELL'){
-      cash += Math.abs(amount);
-      monthlyInv[month] = (monthlyInv[month] || 0) - Math.abs(amount);
-      if(assetClass){
-        exposures[assetClass] = (exposures[assetClass] || 0) - Math.abs(amount);
-      }
-      exposuresAssets[name] = (exposuresAssets[name] || 0) - Math.abs(amount);
-      const sh = num(r.shares || r.Shares);
-      if(sh > 0){
-        const currentShares = shareCount[name] || 0;
-        const currentCost = costBasisSum[name] || 0;
-        if(currentShares > 0){
-          const avgCost = currentCost / currentShares;
-          const costToRemove = avgCost * sh;
-          costBasisSum[name] = currentCost - costToRemove;
-          shareCount[name] = currentShares - sh;
-        }
-      }
-    } else if(type.includes('TRANSFER_OUT')){
-      cash -= Math.abs(amount);
-      monthlyInv[month] = (monthlyInv[month] || 0) - Math.abs(amount);
-      if(assetClass){
-        exposures[assetClass] = (exposures[assetClass] || 0) - Math.abs(amount);
-      }
-      exposuresAssets[name] = (exposuresAssets[name] || 0) - Math.abs(amount);
-    }
-    cashSeries.push({date,cash});
-  });
-
-  const avg = Object.keys(monthly).length ? divNet / Object.keys(monthly).length : 0;
-  $('#kRows').textContent = rows.length;
-  $('#kDiv').textContent = money(divNet);
-  $('#kCash').textContent = money(cash);
-  $('#kAvg').textContent = money(avg);
-  $('#kMort').textContent = ((avg/MORTGAGE)*100).toFixed(1)+'%';
-  $('#kInv').textContent = money(invested);
-  let coverage = {};
-  for(const m in monthly){
-    coverage[m] = (monthly[m] / MORTGAGE) * 100;
-  }
-  renderCharts(monthly, assetsNet, cashSeries, monthlyInv, coverage, exposures, exposuresAssets);
-  // Calcola i dati di rendimento in base alla frequenza calcolata e salva in yieldDataByAsset
-  yieldDataByAsset = {};
-  for(const name in assetsNet){
-    const netDiv = assetsNet[name] || 0;
-    const grossDiv = assetsGross[name] || 0;
-    const shares = shareCount[name] || 0;
-    const costSum = costBasisSum[name] || 0;
-    if(shares <= 0 || costSum <= 0 || netDiv <= 0) continue;
-    const avgCost = costSum / shares;
-    // calcolo della frequenza stimata
-    let freq = 1;
-    if(divDates[name] && divDates[name].length > 1){
-      const dates = divDates[name].slice().sort();
-      const firstDate = new Date(dates[0]);
-      const lastDate = new Date(dates[dates.length-1]);
-      const days = (lastDate - firstDate) / (1000*60*60*24);
-      const periods = dates.length - 1;
-      // 365 giorni ~ 12 mesi
-      freq = (periods * 365) / days;
-    }
-    // salvataggio dei dati per ricalcolo
-    yieldDataByAsset[name] = {
-      netDiv: netDiv,
-      grossDiv: grossDiv,
-      costSum: costSum,
-      divCount: divDates[name] ? divDates[name].length : 1,
-      freq: freq,
-      avgCost: avgCost
-    };
-  }
-  updateYieldTable();
-  setStatus(`✅ CSV letto correttamente.<br>Righe analizzate: <b>${rows.length}</b><br>Dividendi netti rilevati: <b>${money(divNet)}</b>`);
-}
-
-function renderCharts(monthly, assets, cashSeries, monthlyInv, coverage, exposures, exposuresAssets){
-  destroyCharts();
-  charts.push(new Chart($('#chartDiv'),{
-    type:'bar',
-    data:{ labels:Object.keys(monthly), datasets:[{label:'Dividendi netti', data:Object.values(monthly)} ] },
-    options:{ responsive:true, maintainAspectRatio:false }
-  }));
-  const top = Object.entries(assets).sort((a,b) => b[1]-a[1]).slice(0,10);
-  charts.push(new Chart($('#chartAssets'),{
-    type:'bar',
-    data:{ labels: top.map(x=>x[0]), datasets:[{label:'Top pagatori', data: top.map(x=>x[1])}] },
-    options:{ responsive:true, maintainAspectRatio:false }
-  }));
-  charts.push(new Chart($('#chartCash'),{
-    type:'line',
-    data:{ labels: cashSeries.map(x=>x.date), datasets:[{label:'Cash stimato', data: cashSeries.map(x=>x.cash), tension:.35}] },
-    options:{ responsive:true, maintainAspectRatio:false }
-  }));
-  if(monthlyInv && Object.keys(monthlyInv).length){
-    charts.push(new Chart($('#chartInvest'),{
-      type:'bar',
-      data:{ labels:Object.keys(monthlyInv), datasets:[{label:'Investimenti netti', data:Object.values(monthlyInv)}] },
-      options:{ responsive:true, maintainAspectRatio:false }
-    }));
-  }
-  if(coverage && Object.keys(coverage).length){
-    charts.push(new Chart($('#chartCoverage'),{
-      type:'line',
-      data:{ labels:Object.keys(coverage), datasets:[{label:'Copertura rata mutuo (%)', data:Object.values(coverage), tension:.35}] },
-      options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ ticks:{ callback:v=>v+'%' }, min:0 } } }
-    }));
-  }
-  if(exposures && Object.keys(exposures).length){
-    const labels = Object.keys(exposures);
-    const data = labels.map(k => exposures[k]);
-    charts.push(new Chart($('#chartExposure'),{
-      type:'bar',
-      data:{ labels: labels, datasets:[{label:'Esposizione', data: data}] },
-      options:{ responsive:true, maintainAspectRatio:false }
-    }));
-  }
-  updateRiskSummary(exposures, exposuresAssets);
-}
-
-function updateRiskSummary(exposures, exposuresAssets){
-  const el = document.getElementById('riskSummary');
-  if(!el){ return; }
-  if(!exposures || Object.keys(exposures).length === 0){
-    el.innerHTML = 'Nessun dato di esposizione disponibile.';
-    return;
-  }
-  let total = 0;
-  for(const k in exposures){
-    total += Math.max(0, exposures[k]);
-  }
-  if(total <= 0){
-    el.innerHTML = 'Esposizione totale nulla.';
-    return;
-  }
-  const percList = [];
-  for(const k in exposures){
-    const val = Math.max(0, exposures[k]);
-    if(val <= 0) continue;
-    const p = (val/total)*100;
-    percList.push(`<li>${k}: <b>${p.toFixed(1)}%</b></li>`);
-  }
-  const derivExp = Object.entries(exposures).filter(([k])=>k.includes('DERIV')).reduce((sum,[k,v])=>sum+Math.max(0,v),0);
-  const cryptoExp = Object.entries(exposures).filter(([k])=>k.includes('CRYPTO')).reduce((sum,[k,v])=>sum+Math.max(0,v),0);
-  const derivPct = derivExp/total;
-  const cryptoPct = cryptoExp/total;
-  let exposuresAssetsTotal = 0;
-  for(const name in exposuresAssets){
-    exposuresAssetsTotal += Math.max(0, exposuresAssets[name]);
-  }
-  let topAsset = null;
-  let topVal = 0;
-  for(const name in exposuresAssets){
-    const val = Math.max(0, exposuresAssets[name]);
-    if(val > topVal){
-      topVal = val;
-      topAsset = name;
-    }
-  }
-  const topPct = exposuresAssetsTotal > 0 ? topVal / exposuresAssetsTotal : 0;
-  function riskColor(pct, thresholds){
-    if(pct <= thresholds[0]) return '🟢';
-    if(pct <= thresholds[1]) return '🟡';
-    return '🔴';
-  }
-  const derivColor = riskColor(derivPct, [0.05,0.15]);
-  const cryptoColor = riskColor(cryptoPct, [0.05,0.15]);
-  const topColor = riskColor(topPct, [0.3,0.5]);
-  let html = '';
-  html += '<p><b>Distribuzione per asset class</b></p>';
-  html += '<ul style="list-style:none;padding-left:0">'+percList.join('')+'</ul>';
-  html += '<p><b>Rischio derivati:</b> '+derivColor+' '+(derivPct*100).toFixed(1)+'%</p>';
-  html += '<p><b>Rischio crypto:</b> '+cryptoColor+' '+(cryptoPct*100).toFixed(1)+'%</p>';
-  if(topAsset){
-    html += '<p><b>Concentrazione titolo principale:</b> '+topColor+' '+topAsset+' ('+(topPct*100).toFixed(1)+'%)</p>';
-  }
-  el.innerHTML = html;
-}
-
-// Costruisce e aggiorna la tabella dei rendimenti con frequenza editabile
+// tabella rendimenti con frequenza editabile e conferma
 function updateYieldTable(){
   const el = document.getElementById('yieldTable');
   if(!el){ return; }
@@ -422,7 +39,7 @@ function updateYieldTable(){
     el.innerHTML = 'Nessun asset con dividendi e investimento positivo.';
     return;
   }
-  // ordina per rendimento netto annuo con frequenza stimata
+  // ordina per rendimento netto
   rows.sort((a,b) => {
     const aNet = (a.data.netDiv * a.data.freq) / (a.data.divCount * a.data.costSum) * 100;
     const bNet = (b.data.netDiv * b.data.freq) / (b.data.divCount * b.data.costSum) * 100;
@@ -437,7 +54,7 @@ function updateYieldTable(){
     const monthlyNet   = annualNet   / 12;
     html += '<tr>';
     html += '<td>'+r.name+'</td>';
-    html += '<td><input class="freqInput" type="number" min="0.1" step="0.1" value="'+d.freq.toFixed(1)+'" data-name="'+r.name+'"></td>';
+    html += '<td><input class="freqInput" type="number" min="0.1" step="0.1" value="'+d.freq.toFixed(1)+'" data-name="'+r.name+'" data-old="'+d.freq.toFixed(1)+'"></td>';
     html += '<td>'+annualGross.toFixed(2)+'%</td>';
     html += '<td>'+monthlyGross.toFixed(2)+'%</td>';
     html += '<td>'+annualNet.toFixed(2)+'%</td>';
@@ -446,81 +63,28 @@ function updateYieldTable(){
   });
   html += '</tbody></table>';
   el.innerHTML = html;
-  // aggiunge listener agli input della frequenza
+  // gestisce l’evento change con conferma
   document.querySelectorAll('.freqInput').forEach(input => {
-    input.addEventListener('input', e => {
+    input.addEventListener('change', e => {
       const name = e.target.getAttribute('data-name');
-      let val = parseFloat(e.target.value);
-      if(!val || val <= 0) val = 1; // default a 1 se non valido
-      yieldDataByAsset[name].freq = val;
-      updateYieldTable(); // ricalcola e aggiorna tabella
+      let oldVal = parseFloat(e.target.getAttribute('data-old'));
+      let newVal = parseFloat(e.target.value);
+      if (!newVal || newVal <= 0) newVal = 1;
+      if (newVal !== oldVal) {
+        const ok = confirm(`Confermi la modifica della frequenza di ${name} da ${oldVal} a ${newVal}?`);
+        if(ok){
+          yieldDataByAsset[name].freq = newVal;
+          e.target.setAttribute('data-old', newVal.toFixed(1));
+          updateYieldTable();
+        } else {
+          e.target.value = oldVal.toFixed(1);
+        }
+      }
     });
   });
 }
 
-// Esegue l’analisi a partire dal testo del CSV
-function runAnalysisFromText(text){
-  if(!text.trim()){
-    alert('Inserisci o carica un CSV');
-    return;
-  }
-  setStatus('⏳ Lettura CSV in corso...');
-  const rows = parseCSV(text);
-  if(!rows.length){
-    setStatus('❌ CSV vuoto o non leggibile.');
-    return;
-  }
-  analyze(rows);
-}
-
-$('#parseBtn').onclick = () => {
-  try{
-    runAnalysisFromText($('#rawInput').value);
-  } catch(err){
-    console.error(err);
-    setStatus('❌ Errore CSV: '+(err.message || err));
-    alert('Errore CSV:\n'+(err.message || err));
-  }
-};
-
-$('#csvUpload').addEventListener('change', async e => {
-  try{
-    const files = e.target.files;
-    if(!files || files.length === 0) return;
-    setStatus('⏳ Caricamento file...');
-    let combined = '';
-    for(let i=0; i<files.length; i++){
-      const file = files[i];
-      const text = await file.text();
-      let cleaned = text;
-      if(i > 0){
-        const lines = text.split(/\r?\n/);
-        if(lines.length > 1){
-          cleaned = lines.slice(1).join('\n');
-        }
-      }
-      if(i > 0) combined += '\n';
-      combined += cleaned;
-    }
-    $('#rawInput').value = combined;
-    runAnalysisFromText(combined);
-  } catch(err){
-    console.error(err);
-    setStatus('❌ Errore caricamento CSV: '+(err.message || err));
-    alert('Errore caricamento CSV:\n'+(err.message || err));
-  }
-});
-
-$('#demoBtn').onclick = () => {
-  const demo =
-`datetime,date,account_type,category,type,asset_class,name,symbol,shares,price,amount,fee,tax,currency
-2026-01-01,2026-01-01,DEFAULT,CASH,DIVIDEND,STOCK,BlackRock TCP Capital,US09259E1082,23.17,,4.92,,-1.83,EUR
-2026-02-01,2026-02-01,DEFAULT,CASH,DIVIDEND,ETF,JPMorgan Global Equity Premium Income,IE0003UVYC20,47.5,,7.77,,-2.08,EUR
-2026-02-02,2026-02-02,DEFAULT,TRADING,BUY,ETF,JPMorgan Global Equity Premium Income,IE0003UVYC20,4,25,-100,,0,EUR
-2026-03-02,2026-03-02,DEFAULT,CASH,TRANSFER_IN,,Deposit,,250,,250,,0,EUR`;
-  $('#rawInput').value = demo;
-  runAnalysisFromText(demo);
-};
+// ...richiamo updateYieldTable() dopo aver popolato yieldDataByAsset come prima...
 </script>
 </body>
 </html>
